@@ -1,0 +1,912 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+        "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>jQuery BBQ: Back Button & Query Library - Unit Tests</title>
+
+<script type="text/javascript" src="http://benalman.com/code/jquery/dist/jquery.js"></script>
+<script type="text/javascript" src="testrunner.js"></script>
+<link rel="stylesheet" href="testsuite.css">
+
+<script type="text/javascript" src="../jquery.ba-bbq.js"></script>
+<script type="text/javascript" language="javascript">
+<!--
+$(function(){ // START CLOSURE
+
+
+var old_param = $.fn.jquery < '1.4',
+  is_chrome = /chrome/i.test( navigator.userAgent ),
+  params_init = 'a[]=4&a[]=5&a[]=6&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=&c=1',
+  init_url
+  aps = Array.prototype.slice;
+
+if ( $.param.querystring() !== params_init || $.param.fragment() !== params_init ) {
+  init_url = document.location.href;
+  init_url = $.param.querystring( init_url, params_init, 2 );
+  init_url = $.param.fragment( init_url, params_init, 2 );
+  document.location.href = init_url;
+}
+
+$('#jq_version').html( $.fn.jquery );
+
+function notice( txt ) {
+  $('#notice').html( txt || '' );
+}
+
+function run_many_tests() {
+  var tests = aps.call( arguments ),
+    delay = typeof tests[0] === 'number' && tests.shift(),
+    func_each = $.isFunction( tests[0] ) && tests.shift(),
+    func_done = $.isFunction( tests[0] ) && tests.shift(),
+    result;
+  
+  function set_result( i, test ) {
+    result = $.isArray( test )
+      ? func_each.apply( this, test )
+      : $.isFunction( test )
+        ? test( result )
+        : '';
+  };
+  
+  if ( delay ) {
+    stop();
+    
+    (function loopy(){
+      test && test.func && test.func( result );
+      if ( tests.length ) {
+        set_result( 0, tests.shift() );
+        setTimeout( loopy, delay );
+      } else {
+        func_done && func_done();
+        start();
+      }
+    })();
+    
+  } else {
+    $.each( tests, set_result );
+    func_done && func_done();
+  }
+}
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+module( 'jQuery.param' );
+
+var params_obj = { a:['4','5','6'], b:{x:['7'], y:'8', z:['9','0','true','false','undefined','']}, c:'1' },
+  params_obj_coerce = { a:[4,5,6], b:{x:[7], y:8, z:[9,0,true,false,undefined,'']}, c:1 },
+  params_str = params_init,
+  params_str_old = 'a=4&a=5&a=6&b=[object+Object]&c=1';
+
+test( 'jQuery.param.querystring', function() {
+  expect( 6 );
+  
+  equals( $.param.querystring(), params_str, 'params string from document.location' );
+  equals( $.param.querystring( params_str ), params_str, 'params string from string' );
+  equals( $.param.querystring( '?' + params_str ), params_str, 'params string from url' );
+  equals( $.param.querystring( 'foo.html?' + params_str ), params_str, 'params string from url' );
+  equals( $.param.querystring( 'http://a:b@example.com:1234/foo.html?' + params_str ), params_str, 'params string from url' );
+  equals( $.param.querystring( 'http://a:b@example.com:1234/foo.html?' + params_str + '#bippity-boppity-boo' ), params_str, 'params string from url' );
+});
+
+test( 'jQuery.param.fragment', function() {
+  expect( 6 );
+  
+  equals( $.param.fragment(), params_str, 'params string from document.location' );
+  equals( $.param.fragment( params_str ), params_str, 'params string from string' );
+  equals( $.param.fragment( '#' + params_str ), params_str, 'params string from url' );
+  equals( $.param.fragment( 'foo.html#' + params_str ), params_str, 'params string from url' );
+  equals( $.param.fragment( 'http://a:b@example.com:1234/foo.html#' + params_str ), params_str, 'params string from url' );
+  equals( $.param.fragment( 'http://a:b@example.com:1234/foo.html?bippity-boppity-boo#' + params_str ), params_str, 'params string from url' );
+});
+
+test( 'jQuery.param.querystring - build URL', function() {
+  expect( 10 );
+  
+  function fake_encode( params_str ) {
+    return '?' + $.map( params_str.split('&'), encodeURIComponent ).join('&').replace( /%3D/g, '=' ).replace( /%2B/g, '+' );
+  }
+  
+  var pre = 'http://a:b@example.com:1234/foo.html',
+    post = '#get-on-the-floor',
+    current_url = pre + post;
+  
+  run_many_tests(
+    
+    // execute this for each array item
+    function(){
+      current_url = $.param.querystring.apply( this, [ current_url ].concat( aps.call( arguments ) ) );
+    },
+    
+    // tests:
+    
+    [ { a:'2' } ],
+    
+    function(result){
+      equals( current_url, pre + '?a=2' + post, '$.param.querystring( url, Object )' );
+    },
+    
+    [ { b:'2' } ],
+    
+    function(result){
+      equals( current_url, pre + '?a=2&b=2' + post, '$.param.querystring( url, Object )' );
+    },
+    
+    [ { c:true, d:false, e:'undefined', f:'' } ],
+    
+    function(result){
+      equals( current_url, pre + '?a=2&b=2&c=true&d=false&e=undefined&f=' + post, '$.param.querystring( url, Object )' );
+    },
+    
+    [ { a:[4,5,6], b:{x:[7], y:8, z:[9,0,'true','false','undefined','']} }, 2 ],
+    
+    function(result){
+      var params = old_param
+        ? 'a=4&a=5&a=6&b=[object+Object]'
+        : 'a[]=4&a[]=5&a[]=6&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=';
+      
+      equals( current_url, pre + fake_encode( params ) + post, '$.param.querystring( url, Object, 2 )' );
+    },
+    
+    [ { a:'1', c:'2' }, 1 ],
+    
+    function(result){
+      var params = old_param
+        ? 'a=4&a=5&a=6&c=2&b=[object+Object]'
+        : 'a[]=4&a[]=5&a[]=6&c=2&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=';
+      
+      equals( current_url, pre + fake_encode( params ) + post, '$.param.querystring( url, Object, 1 )' );
+    },
+    
+    [ 'foo=1' ],
+    
+    function(result){
+      var params = old_param
+        ? 'a=4&a=5&a=6&c=2&b=[object+Object]&foo=1'
+        : 'a[]=4&a[]=5&a[]=6&c=2&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=&foo=1';
+      
+      equals( current_url, pre + fake_encode( params ) + post, '$.param.querystring( url, String )' );
+    },
+    
+    [ 'foo=2&bar=3', 1 ],
+    
+    function(result){
+      var params = old_param
+        ? 'foo=1&bar=3&a=4&a=5&a=6&c=2&b=[object+Object]'
+        : 'foo=1&bar=3&a[]=4&a[]=5&a[]=6&c=2&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=';
+      
+      equals( current_url, pre + fake_encode( params ) + post, '$.param.querystring( url, String, 1 )' );
+    },
+    
+    [ 'http://example.com/test.html?/path/to/file.php#the-cow-goes-moo', 2 ],
+    
+    function(result){
+      equals( current_url, pre + '?/path/to/file.php' + post, '$.param.querystring( url, String, 2 )' );
+    },
+    
+    [ '?another-example', 2 ],
+    
+    function(result){
+      equals( current_url, pre + '?another-example' + post, '$.param.querystring( url, String, 2 )' );
+    },
+    
+    [ 'i_am_out_of_witty_strings', 2 ],
+    
+    function(result){
+      equals( current_url, pre + '?i_am_out_of_witty_strings' + post, '$.param.querystring( url, String, 2 )' );
+    }
+    
+  );
+  
+});
+
+test( 'jQuery.param.fragment - build URL', function() {
+  expect( 10 );
+  
+  function fake_encode( params_str ) {
+    return '#' + $.map( params_str.split('&'), encodeURIComponent ).join('&').replace( /%3D/g, '=' ).replace( /%2B/g, '+' );
+  }
+  
+  var pre = 'http://a:b@example.com:1234/foo.html?and-dance-with-me',
+    current_url = pre;
+  
+  run_many_tests(
+    
+    // execute this for each array item
+    function(){
+      current_url = $.param.fragment.apply( this, [ current_url ].concat( aps.call( arguments ) ) );
+    },
+    
+    // tests:
+    
+    [ { a:'2' } ],
+    
+    function(result){
+      equals( current_url, pre + '#a=2', '$.param.fragment( url, Object )' );
+    },
+    
+    [ { b:'2' } ],
+    
+    function(result){
+      equals( current_url, pre + '#a=2&b=2', '$.param.fragment( url, Object )' );
+    },
+    
+    [ { c:true, d:false, e:'undefined', f:'' } ],
+    
+    function(result){
+      equals( current_url, pre + '#a=2&b=2&c=true&d=false&e=undefined&f=', '$.param.fragment( url, Object )' );
+    },
+    
+    [ { a:[4,5,6], b:{x:[7], y:8, z:[9,0,'true','false','undefined','']} }, 2 ],
+    
+    function(result){
+      var params = old_param
+        ? 'a=4&a=5&a=6&b=[object+Object]'
+        : 'a[]=4&a[]=5&a[]=6&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=';
+      
+      equals( current_url, pre + fake_encode( params ), '$.param.fragment( url, Object, 2 )' );
+    },
+    
+    [ { a:'1', c:'2' }, 1 ],
+    
+    function(result){
+      var params = old_param
+        ? 'a=4&a=5&a=6&c=2&b=[object+Object]'
+        : 'a[]=4&a[]=5&a[]=6&c=2&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=';
+      
+      equals( current_url, pre + fake_encode( params ), '$.param.fragment( url, Object, 1 )' );
+    },
+    
+    [ 'foo=1' ],
+    
+    function(result){
+      var params = old_param
+        ? 'a=4&a=5&a=6&c=2&b=[object+Object]&foo=1'
+        : 'a[]=4&a[]=5&a[]=6&c=2&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=&foo=1';
+      
+      equals( current_url, pre + fake_encode( params ), '$.param.fragment( url, String )' );
+    },
+    
+    [ 'foo=2&bar=3', 1 ],
+    
+    function(result){
+      var params = old_param
+        ? 'foo=1&bar=3&a=4&a=5&a=6&c=2&b=[object+Object]'
+        : 'foo=1&bar=3&a[]=4&a[]=5&a[]=6&c=2&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=';
+      
+      equals( current_url, pre + fake_encode( params ), '$.param.fragment( url, String, 1 )' );
+    },
+    
+    [ 'http://example.com/test.html?the-cow-goes-moo#/path/to/file.php', 2 ],
+    
+    function(result){
+      equals( current_url, pre + '#/path/to/file.php', '$.param.fragment( url, String, 2 )' );
+    },
+    
+    [ '#another-example', 2 ],
+    
+    function(result){
+      equals( current_url, pre + '#another-example', '$.param.fragment( url, String, 2 )' );
+    },
+    
+    [ 'i_am_out_of_witty_strings', 2 ],
+    
+    function(result){
+      equals( current_url, pre + '#i_am_out_of_witty_strings', '$.param.fragment( url, String, 2 )' );
+    }
+    
+  );
+  
+});
+
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+module( 'jQuery.deparam' );
+
+test( 'jQuery.deparam - 1.4-style params', function() {
+  expect( 2 );
+  same( $.deparam( params_str ), params_obj, '$.deparam( String )' );
+  same( $.deparam( params_str, true ), params_obj_coerce, '$.deparam( String, true )' );
+});
+
+test( 'jQuery.deparam - pre-1.4-style params', function() {
+  var params_str = 'a=1&a=2&a=3&b=4&c=5&c=6&c=true&c=false&c=undefined&c=&d=7',
+    params_obj = { a:['1','2','3'], b:'4', c:['5','6','true','false','undefined',''], d:'7' },
+    params_obj_coerce = { a:[1,2,3], b:4, c:[5,6,true,false,undefined,''], d:7 };
+    
+  expect( 2 );
+  same( $.deparam( params_str ), params_obj, '$.deparam( String )' );
+  same( $.deparam( params_str, true ), params_obj_coerce, '$.deparam( String, true )' );
+});
+
+test( 'jQuery.deparam.querystring', function() {
+  expect( 12 );
+  
+  same( $.deparam.querystring(), params_obj, 'params obj from document.location' );
+  same( $.deparam.querystring( true ), params_obj_coerce, 'params obj from document.location, coerced' );
+  same( $.deparam.querystring( params_str ), params_obj, 'params obj from string' );
+  same( $.deparam.querystring( params_str, true ), params_obj_coerce, 'params obj from string, coerced' );
+  same( $.deparam.querystring( '?' + params_str ), params_obj, 'params obj from string' );
+  same( $.deparam.querystring( '?' + params_str, true ), params_obj_coerce, 'params obj from string, coerced' );
+  same( $.deparam.querystring( 'foo.html?' + params_str ), params_obj, 'params obj from string' );
+  same( $.deparam.querystring( 'foo.html?' + params_str, true ), params_obj_coerce, 'params obj from string, coerced' );
+  same( $.deparam.querystring( 'http://a:b@example.com:1234/foo.html?' + params_str ), params_obj, 'params obj from string' );
+  same( $.deparam.querystring( 'http://a:b@example.com:1234/foo.html?' + params_str, true ), params_obj_coerce, 'params obj from string, coerced' );
+  same( $.deparam.querystring( 'http://a:b@example.com:1234/foo.html?' + params_str + '#bippity-boppity-boo' ), params_obj, 'params obj from string' );
+  same( $.deparam.querystring( 'http://a:b@example.com:1234/foo.html?' + params_str + '#bippity-boppity-boo', true ), params_obj_coerce, 'params obj from string, coerced' );
+});
+
+test( 'jQuery.deparam.fragment', function() {
+  expect( 12 );
+  
+  same( $.deparam.fragment(), params_obj, 'params obj from document.location' );
+  same( $.deparam.fragment( true ), params_obj_coerce, 'params obj from document.location, coerced' );
+  same( $.deparam.fragment( params_str ), params_obj, 'params obj from string' );
+  same( $.deparam.fragment( params_str, true ), params_obj_coerce, 'params obj from string, coerced' );
+  same( $.deparam.fragment( '#' + params_str ), params_obj, 'params obj from string' );
+  same( $.deparam.fragment( '#' + params_str, true ), params_obj_coerce, 'params obj from string, coerced' );
+  same( $.deparam.fragment( 'foo.html#' + params_str ), params_obj, 'params obj from string' );
+  same( $.deparam.fragment( 'foo.html#' + params_str, true ), params_obj_coerce, 'params obj from string, coerced' );
+  same( $.deparam.fragment( 'http://a:b@example.com:1234/foo.html#' + params_str ), params_obj, 'params obj from string' );
+  same( $.deparam.fragment( 'http://a:b@example.com:1234/foo.html#' + params_str, true ), params_obj_coerce, 'params obj from string, coerced' );
+  same( $.deparam.fragment( 'http://a:b@example.com:1234/foo.html?bippity-boppity-boo#' + params_str ), params_obj, 'params obj from string' );
+  same( $.deparam.fragment( 'http://a:b@example.com:1234/foo.html?bippity-boppity-boo#' + params_str, true ), params_obj_coerce, 'params obj from string, coerced' );
+});
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+module( 'jQuery.fn' );
+
+$.elemUrlAttr({ span: 'arbitrary_attr' });
+var test_elems = 'a form link span'.split(' ');
+
+function init_url_attr( container, url ) {
+  var container = $('<div/>');
+  $.each( test_elems, function(i,v){
+    $('<' + v + '/>')
+      .attr( $.elemUrlAttr()[ v ], url )
+      .appendTo( container );
+  });
+  return container;
+};
+
+function test_url_attr( container ) {
+  var url;
+  
+  $.each( test_elems, function(i,v){
+    var val = container.children( v ).attr( $.elemUrlAttr()[ v ] );
+    if ( !url ) {
+      url = val;
+    } else if ( val !== url ) {
+      url = -1;
+    }
+  });
+  
+  return url;
+};
+
+test( 'jQuery.fn.querystring', function() {
+  expect( 60 );
+  
+  function fake_encode( params_str ) {
+    return '?' + $.map( params_str.split('&'), encodeURIComponent ).join('&').replace( /%3D/g, '=' ).replace( /%2B/g, '+' );
+  }
+  
+  var pre = 'http://a:b@example.com:1234/foo.html',
+    post = '#get-on-the-floor',
+    current_url = pre + post;
+  
+  run_many_tests(
+    
+    // execute this for each array item
+    function(){
+      var container,
+        elems;
+      
+      container = init_url_attr( container, current_url );
+      elems = container.children('span');
+      equals( elems.length, 1, 'select the correct elements' );
+      equals( elems.querystring.apply( elems, [ 'arbitrary_attr' ].concat( aps.call( arguments ) ) ), elems, 'pass query string' );
+      
+      container = init_url_attr( container, current_url );
+      elems = container.children('a, link');
+      equals( elems.length, 2, 'select the correct elements' );
+      equals( elems.querystring.apply( elems, [ 'href' ].concat( aps.call( arguments ) ) ), elems, 'pass query string' );
+      
+      container = init_url_attr( container, current_url );
+      elems = container.children();
+      equals( elems.querystring.apply( elems, aps.call( arguments ) ), elems, 'pass query string' );
+      
+      current_url = test_url_attr( container );
+    },
+    
+    // tests:
+    
+    [ { a:'2' } ],
+    
+    function(result){
+      equals( current_url, pre + '?a=2' + post, '$.fn.querystring( url, Object )' );
+    },
+    
+    [ { b:'2' } ],
+    
+    function(result){
+      equals( current_url, pre + '?a=2&b=2' + post, '$.fn.querystring( url, Object )' );
+    },
+    
+    [ { c:true, d:false, e:'undefined', f:'' } ],
+    
+    function(result){
+      equals( current_url, pre + '?a=2&b=2&c=true&d=false&e=undefined&f=' + post, '$.fn.querystring( url, Object )' );
+    },
+    
+    [ { a:[4,5,6], b:{x:[7], y:8, z:[9,0,'true','false','undefined','']} }, 2 ],
+    
+    function(result){
+      var params = old_param
+        ? 'a=4&a=5&a=6&b=[object+Object]'
+        : 'a[]=4&a[]=5&a[]=6&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=';
+      
+      equals( current_url, pre + fake_encode( params ) + post, '$.fn.querystring( url, Object, 2 )' );
+    },
+    
+    [ { a:'1', c:'2' }, 1 ],
+    
+    function(result){
+      var params = old_param
+        ? 'a=4&a=5&a=6&c=2&b=[object+Object]'
+        : 'a[]=4&a[]=5&a[]=6&c=2&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=';
+      
+      equals( current_url, pre + fake_encode( params ) + post, '$.fn.querystring( url, Object, 1 )' );
+    },
+    
+    [ 'foo=1' ],
+    
+    function(result){
+      var params = old_param
+        ? 'a=4&a=5&a=6&c=2&b=[object+Object]&foo=1'
+        : 'a[]=4&a[]=5&a[]=6&c=2&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=&foo=1';
+      
+      equals( current_url, pre + fake_encode( params ) + post, '$.fn.querystring( url, String )' );
+    },
+    
+    [ 'foo=2&bar=3', 1 ],
+    
+    function(result){
+      var params = old_param
+        ? 'foo=1&bar=3&a=4&a=5&a=6&c=2&b=[object+Object]'
+        : 'foo=1&bar=3&a[]=4&a[]=5&a[]=6&c=2&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=';
+      
+      equals( current_url, pre + fake_encode( params ) + post, '$.fn.querystring( url, String, 1 )' );
+    },
+    
+    [ 'http://example.com/test.html?/path/to/file.php#the-cow-goes-moo', 2 ],
+    
+    function(result){
+      equals( current_url, pre + '?/path/to/file.php' + post, '$.fn.querystring( url, String, 2 )' );
+    },
+    
+    [ '?another-example', 2 ],
+    
+    function(result){
+      equals( current_url, pre + '?another-example' + post, '$.fn.querystring( url, String, 2 )' );
+    },
+    
+    [ 'i_am_out_of_witty_strings', 2 ],
+    
+    function(result){
+      equals( current_url, pre + '?i_am_out_of_witty_strings' + post, '$.fn.querystring( url, String, 2 )' );
+    }
+    
+  );
+  
+});
+
+test( 'jQuery.fn.fragment', function() {
+  expect( 60 );
+  
+  function fake_encode( params_str ) {
+    return '#' + $.map( params_str.split('&'), encodeURIComponent ).join('&').replace( /%3D/g, '=' ).replace( /%2B/g, '+' );
+  }
+  
+  var pre = 'http://a:b@example.com:1234/foo.html?and-dance-with-me',
+    current_url = pre;
+  
+  run_many_tests(
+    
+    // execute this for each array item
+    function(){
+      var container,
+        elems;
+      
+      container = init_url_attr( container, current_url );
+      elems = container.children('span');
+      equals( elems.length, 1, 'select the correct elements' );
+      equals( elems.fragment.apply( elems, [ 'arbitrary_attr' ].concat( aps.call( arguments ) ) ), elems, 'pass fragment' );
+      
+      container = init_url_attr( container, current_url );
+      elems = container.children('a, link');
+      equals( elems.length, 2, 'select the correct elements' );
+      equals( elems.fragment.apply( elems, [ 'href' ].concat( aps.call( arguments ) ) ), elems, 'pass fragment' );
+      
+      container = init_url_attr( container, current_url );
+      elems = container.children();
+      equals( elems.fragment.apply( elems, aps.call( arguments ) ), elems, 'pass fragment' );
+      
+      current_url = test_url_attr( container );
+    },
+    
+    // tests:
+    
+    [ { a:'2' } ],
+    
+    function(result){
+      equals( current_url, pre + '#a=2', '$.fn.fragment( url, Object )' );
+    },
+    
+    [ { b:'2' } ],
+    
+    function(result){
+      equals( current_url, pre + '#a=2&b=2', '$.fn.fragment( url, Object )' );
+    },
+    
+    [ { c:true, d:false, e:'undefined', f:'' } ],
+    
+    function(result){
+      equals( current_url, pre + '#a=2&b=2&c=true&d=false&e=undefined&f=', '$.fn.fragment( url, Object )' );
+    },
+    
+    [ { a:[4,5,6], b:{x:[7], y:8, z:[9,0,'true','false','undefined','']} }, 2 ],
+    
+    function(result){
+      var params = old_param
+        ? 'a=4&a=5&a=6&b=[object+Object]'
+        : 'a[]=4&a[]=5&a[]=6&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=';
+      
+      equals( current_url, pre + fake_encode( params ), '$.fn.fragment( url, Object, 2 )' );
+    },
+    
+    [ { a:'1', c:'2' }, 1 ],
+    
+    function(result){
+      var params = old_param
+        ? 'a=4&a=5&a=6&c=2&b=[object+Object]'
+        : 'a[]=4&a[]=5&a[]=6&c=2&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=';
+      
+      equals( current_url, pre + fake_encode( params ), '$.fn.fragment( url, Object, 1 )' );
+    },
+    
+    [ 'foo=1' ],
+    
+    function(result){
+      var params = old_param
+        ? 'a=4&a=5&a=6&c=2&b=[object+Object]&foo=1'
+        : 'a[]=4&a[]=5&a[]=6&c=2&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=&foo=1';
+      
+      equals( current_url, pre + fake_encode( params ), '$.fn.fragment( url, String )' );
+    },
+    
+    [ 'foo=2&bar=3', 1 ],
+    
+    function(result){
+      var params = old_param
+        ? 'foo=1&bar=3&a=4&a=5&a=6&c=2&b=[object+Object]'
+        : 'foo=1&bar=3&a[]=4&a[]=5&a[]=6&c=2&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=';
+      
+      equals( current_url, pre + fake_encode( params ), '$.fn.fragment( url, String, 1 )' );
+    },
+    
+    [ 'http://example.com/test.html?the-cow-goes-moo#/path/to/file.php', 2 ],
+    
+    function(result){
+      equals( current_url, pre + '#/path/to/file.php', '$.fn.fragment( url, String, 2 )' );
+    },
+    
+    [ '#another-example', 2 ],
+    
+    function(result){
+      equals( current_url, pre + '#another-example', '$.fn.fragment( url, String, 2 )' );
+    },
+    
+    [ 'i_am_out_of_witty_strings', 2 ],
+    
+    function(result){
+      equals( current_url, pre + '#i_am_out_of_witty_strings', '$.fn.fragment( url, String, 2 )' );
+    }
+    
+  );
+  
+});
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+module( 'jQuery.history' );
+
+test( 'jQuery.history.pushState(), jQuery.history.getState(), window.onhashchange', function() {
+  expect( old_param ? 43 : 73 );
+  
+  var a, b, c, d, e, f, x, y, hash, obj, event, msg = 'Testing history';
+  
+  $.history.pushState();
+  equals( document.location.hash.replace( /^#/, ''), '', 'document.location hash should be empty' );
+  
+  $.history.pushState({ a:'1', b:'1' });
+  same( $.deparam.fragment(), { a:'1', b:'1' }, 'hash should be set properly' );
+  
+  $(window).bind( 'hashchange', function(evt) {
+    var hash_str = $.param.fragment(),
+      param_obj = $.history.getState(),
+      param_val = $.history.getState( 'param_name' );
+    
+    event = evt;
+    hash = $.param.fragment();
+    obj = { str: $.history.getState(), coerce: $.history.getState( true ) };
+    a = { str: $.history.getState( 'a' ), coerce: $.history.getState( 'a', true ) };
+    b = { str: $.history.getState( 'b' ), coerce: $.history.getState( 'b', true ) };
+    c = { str: $.history.getState( 'c' ), coerce: $.history.getState( 'c', true ) };
+    d = { str: $.history.getState( 'd' ), coerce: $.history.getState( 'd', true ) };
+    e = { str: $.history.getState( 'e' ), coerce: $.history.getState( 'e', true ) };
+    f = { str: $.history.getState( 'f' ), coerce: $.history.getState( 'f', true ) };
+    
+  }).trigger( 'hashchange' );
+  
+  same( obj.str, { a:'1', b:'1' }, 'hashchange triggered manually: $.history.getState()' );
+  same( obj.coerce, { a:1, b:1 },  'hashchange triggered manually: $.history.getState( true )' );
+  equals( a.str, '1', 'hashchange triggered manually: $.history.getState( "a" )' );
+  equals( a.coerce, 1, 'hashchange triggered manually: $.history.getState( "a", true )' );
+  
+  if ( !old_param ) {
+    same( event.getState(), { a:'1', b:'1' }, 'hashchange triggered manually: event.getState()' );
+    same( event.getState(true), { a:1, b:1 },  'hashchange triggered manually: event.getState( true )' );
+    equals( event.getState('a'), '1', 'hashchange triggered manually: event.getState( "a" )' );
+    equals( event.getState('a',true), 1, 'hashchange triggered manually: event.getState( "a", true )' );
+  }
+  
+  run_many_tests(
+    // run asynchronously
+    250,
+    
+    // execute this for each array item
+    function(){
+      notice( msg += '.' );
+      $.history.pushState.apply( this, aps.call( arguments ) );
+    },
+    
+    // execute this at the end
+    function(){
+      notice();
+    },
+    
+    // tests:
+    
+    [ { a:'2' } ],
+    
+    function(result){
+      same( obj.str, { a:'2', b:'1' }, '$.history.getState()' );
+      same( obj.coerce, { a:2, b:1 },  '$.history.getState( true )' );
+      equals( a.str, '2', '$.history.getState( "a" )' );
+      equals( a.coerce, 2, '$.history.getState( "a", true )' );
+      if ( !old_param ) {
+        same( event.getState(), { a:'2', b:'1' }, 'event.getState()' );
+        same( event.getState(true), { a:2, b:1 },  'event.getState( true )' );
+        equals( event.getState('a'), '2', 'event.getState( "a" )' );
+        equals( event.getState('a',true), 2, 'event.getState( "a", true )' );
+      }
+    },
+    
+    [ { b:'2' } ],
+    
+    function(result){
+      same( obj.str, { a:'2', b:'2' }, '$.history.getState()' );
+      same( obj.coerce, { a:2, b:2 },  '$.history.getState( true )' );
+      equals( b.str, '2', '$.history.getState( "b" )' );
+      equals( b.coerce, 2, '$.history.getState( "b", true )' );
+      if ( !old_param ) {
+        same( event.getState(), { a:'2', b:'2' }, 'event.getState()' );
+        same( event.getState(true), { a:2, b:2 },  'event.getState( true )' );
+        equals( event.getState('b'), '2', 'event.getState( "b" )' );
+        equals( event.getState('b',true), 2, 'event.getState( "b", true )' );
+      }
+    },
+    
+    [ { c:true, d:false, e:'undefined', f:'' } ],
+    
+    function(result){
+      same( obj.str, { a:'2', b:'2', c:'true', d:'false', e:'undefined', f:'' }, '$.history.getState()' );
+      same( obj.coerce, { a:2, b:2, c:true, d:false, e:undefined, f:'' },  '$.history.getState( true )' );
+      equals( c.str, 'true', '$.history.getState( "c" )' );
+      equals( c.coerce, true, '$.history.getState( "c", true )' );
+      equals( d.str, 'false', '$.history.getState( "d" )' );
+      equals( d.coerce, false, '$.history.getState( "d", true )' );
+      equals( e.str, 'undefined', '$.history.getState( "e" )' );
+      equals( e.coerce, undefined, '$.history.getState( "e", true )' );
+      equals( f.str, '', '$.history.getState( "f" )' );
+      equals( f.coerce, '', '$.history.getState( "f", true )' );
+      if ( !old_param ) {
+        same( event.getState(), { a:'2', b:'2', c:'true', d:'false', e:'undefined', f:'' }, 'event.getState()' );
+        same( event.getState(true), { a:2, b:2, c:true, d:false, e:undefined, f:'' },  'event.getState( true )' );
+        equals( event.getState('c'), 'true', 'event.getState( "c" )' );
+        equals( event.getState('c',true), true, 'event.getState( "c", true )' );
+        equals( event.getState('d'), 'false', 'event.getState( "d" )' );
+        equals( event.getState('d',true), false, 'event.getState( "d", true )' );
+        equals( event.getState('e'), 'undefined', 'event.getState( "e" )' );
+        equals( event.getState('e',true), undefined, 'event.getState( "e", true )' );
+        equals( event.getState('f'), '', 'event.getState( "f" )' );
+        equals( event.getState('f',true), '', 'event.getState( "f", true )' );
+      }
+    },
+    
+    [ { a:[4,5,6], b:{x:[7], y:8, z:[9,0,'true','false','undefined','']} }, 2 ],
+    
+    function(result){
+      var b_str = old_param
+          ? '[object Object]'
+          : {x:['7'], y:'8', z:['9','0','true','false','undefined','']},
+        b_coerce = old_param
+          ? '[object Object]'
+          : {x:[7], y:8, z:[9,0,true,false,undefined,'']};
+      
+      same( obj.str, { a:['4','5','6'], b:b_str }, '$.history.getState()' );
+      same( obj.coerce, { a:[4,5,6], b:b_coerce },  '$.history.getState( true )' );
+      same( a.str, ['4','5','6'], '$.history.getState( "a" )' );
+      same( a.coerce, [4,5,6], '$.history.getState( "a", true )' );
+      if ( !old_param ) {
+        same( event.getState(), { a:['4','5','6'], b:b_str }, 'event.getState()' );
+        same( event.getState(true), { a:[4,5,6], b:b_coerce },  'event.getState( true )' );
+        same( event.getState('a'), ['4','5','6'], 'event.getState( "a" )' );
+        same( event.getState('a',true), [4,5,6], 'event.getState( "a", true )' );
+      }
+    },
+    
+    [ { a:'1', c:'2' }, 1 ],
+    
+    function(result){
+      var b_str = old_param
+          ? '[object Object]'
+          : {x:['7'], y:'8', z:['9','0','true','false','undefined','']},
+        b_coerce = old_param
+          ? '[object Object]'
+          : {x:[7], y:8, z:[9,0,true,false,undefined,'']};
+      
+      same( obj.str, { a:['4','5','6'], b:b_str, c:'2' }, '$.history.getState()' );
+      same( obj.coerce, { a:[4,5,6], b:b_coerce, c:2 },  '$.history.getState( true )' );
+      if ( !old_param ) {
+        same( event.getState(), { a:['4','5','6'], b:b_str, c:'2' }, 'event.getState()' );
+        same( event.getState(true), { a:[4,5,6], b:b_coerce, c:2 },  'event.getState( true )' );
+      }
+    },
+    
+    [ '#/path/to/file.php', 2 ],
+    
+    function(result){
+      equals( hash, '/path/to/file.php', '$.param.fragment()' );
+      if ( !old_param ) {
+        equals( event.fragment, '/path/to/file.php', 'event.fragment' );
+      }
+    },
+    
+    [],
+    
+    function(result){
+      equals( hash, '', '$.param.fragment()' );
+      if ( !old_param ) {
+        equals( event.fragment, '', 'event.fragment' );
+      }
+    },
+    
+    function(result){
+      $(window).bind( 'hashchange', function(evt){
+        x = $.param.fragment();
+      });
+    },
+    
+    [ '#omg_ponies', 2 ],
+    
+    function(result){
+      equals( hash, 'omg_ponies', 'event handler 1: $.param.fragment()' );
+      equals( x, 'omg_ponies', 'event handler 2: $.param.fragment()' );
+      
+      hash = x = '';
+      equals( hash + x, '', 'vars reset' );
+      
+      $(window).triggerHandler( 'hashchange' );
+      equals( hash, 'omg_ponies', 'event handler 1: $.param.fragment()' );
+      equals( x, 'omg_ponies', 'event handler 2: $.param.fragment()' );
+      
+      hash = x = '';
+      equals( hash + x, '', 'vars reset' );
+      
+      $(window).unbind( 'hashchange' );
+    },
+    
+    [ '#almost_done', 2 ],
+    
+    function(result){
+      equals( hash, '', 'event handler 1: $.param.fragment()' );
+      equals( x, '', 'event handler 2: $.param.fragment()' );
+      
+      ok( !$.data( window, 'events' ).hashchange, 'hashchange event unbound' );
+    },
+    
+    [ '#' ],
+    
+    function(result){
+      x = [];
+      $(window).bind( 'hashchange', function(evt){
+        x.push( $.param.fragment() );
+      });
+    },
+    
+    function(result){
+      !is_chrome && window.history.go( -1 );
+    },
+    
+    function(result){
+      !is_chrome && window.history.go( -1 );
+    },
+    
+    function(result){
+      !is_chrome && window.history.go( -1 );
+    },
+    
+    function(result){
+      !is_chrome && window.history.go( -1 );
+    },
+    
+    function(result){
+      if ( is_chrome ) {
+        ok( true, 'history is sporadically broken in chrome, this seems to be a chrome bug' );
+      } else {
+        same( x, ['almost_done', 'omg_ponies', '', '/path/to/file.php'], 'back button and window.history.go(-1) should work' );
+      }
+      
+      $(window).unbind( 'hashchange' );
+      ok( !$.data( window, 'events' ).hashchange, 'hashchange event unbound' );
+    },
+    
+    [ '#all_done' ]
+    
+  );
+  
+});
+
+
+}); // END CLOSURE
+//-->
+</script>
+<style type="text/css" title="text/css" media="screen">
+<!--
+
+#notice {
+  font-weight: 700;
+  color: green;
+  margin-left: 3em;
+}
+
+h3 {
+  margin-left: 10px;
+}
+
+-->
+</style>
+</head>
+<body>
+
+<h1>jQuery BBQ: Back Button & Query Library - Unit Tests (<a href="/projects/jquery-bbq-plugin/">documentation / source</a>)</h1>
+<h2 id="banner"></h2>
+<h2 id="userAgent"></h2>
+
+<h3>These unit tests include jQuery <span id="jq_version">...</span>. To view the unit tests using jQuery 1.3.2, <a href="test-1.3.2.html">click here</a></h3>
+
+<ol id="tests"></ol>
+<div id="main"></div>
+
+<div id="notice"></div>
+
+</body>
+</html>

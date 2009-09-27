@@ -1,5 +1,5 @@
 /*!
- * jQuery BBQ: Back Button & Query Library - v0.1pre - 9/22/2009
+ * jQuery BBQ: Back Button & Query Library - v0.1pre - 9/27/2009
  * http://benalman.com/projects/jquery-bbq-plugin/
  * 
  * Copyright (c) 2009 "Cowboy" Ben Alman
@@ -9,23 +9,28 @@
 
 // Script: jQuery BBQ: Back Button & Query Library
 //
-// Version: 0.1pre, Date: 9/22/2009
-// 
-// Tested with jQuery 1.3.2 in Internet Explorer 6-8, Firefox 3-3.6a,
-// Safari 3-4, Chrome, Opera 9.6.
+// *Version: 0.1pre, Last updated: 9/27/2009*
 // 
 // Home       - http://benalman.com/projects/jquery-bbq-plugin/
+// GitHub     - http://github.com/cowboy/jquery-bbq/
 // Source     - http://github.com/cowboy/jquery-bbq/raw/master/jquery.ba-bbq.js
 // (Minified) - http://github.com/cowboy/jquery-bbq/raw/master/jquery.ba-bbq.min.js (3.1kb)
-// Unit Tests - http://benalman.com/code/projects/jquery-bbq/unit/
 // 
 // About: License
 // 
-// Copyright (c) 2009 "Cowboy" Ben Alman
-// 
-// Licensed under the MIT license
-// 
+// Copyright (c) 2009 "Cowboy" Ben Alman,
+// Licensed under the MIT license.
 // http://benalman.com/about/license/
+// 
+// About: Support and Testing
+// 
+// Information about what version or versions of jQuery this plugin has been
+// tested with, what browsers it has been tested in, and where the unit tests
+// reside (so you can test it yourself).
+// 
+// jQuery Versions - 1.3.2, 1.4pre
+// Browsers Tested - Internet Explorer 6-8, Firefox 2-3.6, Safari 3-4, Chrome, Opera 9.6-10.
+// Unit Tests      - http://benalman.com/code/projects/jquery-bbq/unit/test.html
 // 
 // About: Revision History
 // 
@@ -49,26 +54,28 @@
     jq_deparam,
     jq_deparam_fragment,
     jq_history = $.history = $.history || {},
-    jq_history_add,
+    jq_history_pushState,
+    jq_elemUrlAttr,
     fake_onhashchange,
     
     // Reused strings.
-    hashchange = 'hashchange',
+    str_hashchange = 'hashchange',
     str_querystring = 'querystring',
     str_fragment = 'fragment',
     str_hash = 'hash',
+    str_elemUrlAttr = 'elemUrlAttr',
     str_href = 'href',
     str_src = 'src',
     
     // Does the browser support window.onhashchange?
-    supports_onhashchange = 'on' + hashchange in window,
+    supports_onhashchange = 'on' + str_hashchange in window,
     
     // Reused RegExp.
     re_trim_querystring = /^.*\?|#.*$/g,
-    re_trim_fragment = /^.*\#/, // /^[^#]*\#?/,
+    re_trim_fragment = /^.*\#/,
     
-    // Used by jQuery.param.urlAttr.
-    tag_attr = {};
+    // Used by jQuery.elemUrlAttr.
+    elemUrlAttr_cache = {};
   
   // A few commonly used bits, broken out to help reduce minified file size.
   
@@ -87,45 +94,50 @@
     };
   };
   
+  // Section: Param (to string)
+  // 
   // Method: jQuery.param.querystring
   // 
-  // Retrieve the query string from a URL or the current document. If a params
-  // object is passed in, a serialized params string is returned.
+  // Retrieve the query string from a URL or if no arguments are passed, the
+  // current document.location.
   // 
   // Usage:
   // 
-  //  jQuery.param.querystring( [ params ] );                                - -
+  // > jQuery.param.querystring( [ url ] );
   // 
   // Arguments:
   // 
-  //  params_or_url - (String or Object) A params string or URL containing query
-  //    string params to be parsed, or an object to be serialized.
+  //  url - (String) A URL containing query string params to be parsed.
   // 
   // Returns:
   // 
-  //  (String) A params string with urlencoded data in the format 'a=b&c=d&e=f'.
+  //  (String) The parsed query string, with any leading "?" removed.
+  //
   
   // Method: jQuery.param.querystring (build url)
   // 
-  // Merge a URL (with or without pre-existing query string params) plus any
+  // Merge a URL, with or without pre-existing query string params, plus any
   // object, params string or URL containing query string params into a new URL.
   // 
   // Usage:
   // 
-  //  jQuery.param.querystring( url, params [, merge_mode ] );               - -
+  // > jQuery.param.querystring( url, params [, merge_mode ] );
   // 
   // Arguments:
   // 
   //  url - (String) A valid URL for params to be merged into. This URL may
   //    contain a query string and/or fragment (hash).
-  //  params - (Object) An object, params string, or URL containing query string
-  //    params to be merged into the URL.
+  //  params - (String) A params string or URL containing query string params to
+  //    be merged into url.
+  //  params - (Object) A params object to be merged into url.
   //  merge_mode - (Number) Merge behavior defaults to 0 if merge_mode is not
   //    specified, and is as-follows:
   // 
-  //    * 0: params argument will override any params in url.
-  //    * 1: any params in url will override params argument.
-  //    * 2: params argument will completely replace any params in url.
+  //    * 0: params in the params argument will override any query string
+  //         params in url.
+  //    * 1: any query string params in url will override params in the params
+  //         argument.
+  //    * 2: params argument will completely replace any query string in url.
   // 
   // Returns:
   // 
@@ -134,21 +146,20 @@
   
   // Method: jQuery.param.fragment
   // 
-  // Retrieve the fragment (hash) from a URL or the current document. If a
-  // params object is passed in, a serialized params string is returned.
+  // Retrieve the fragment (hash) from a URL or if no arguments are passed, the
+  // current document.location.
   // 
   // Usage:
   // 
-  //  jQuery.param.fragment( [ params_or_url ] );                            - -
+  // > jQuery.param.fragment( [ url ] );
   // 
   // Arguments:
   // 
-  //  params_or_url - (String or Object) A params string or URL containing
-  //    fragment (hash) params to be parsed, or an object to be serialized.
+  //  url - (String) A URL containing fragment (hash) params to be parsed.
   // 
   // Returns:
   // 
-  //  (String) A params string with urlencoded data in the format 'a=b&c=d&e=f'.
+  //  (String) The parsed fragment (hash) string, with any leading "#" removed.
   
   // Method: jQuery.param.fragment (build url)
   // 
@@ -158,27 +169,30 @@
   // 
   // Usage:
   // 
-  //  jQuery.param.fragment( url, params [, merge_mode ] );                  - -
+  // > jQuery.param.fragment( url, params [, merge_mode ] );
   // 
   // Arguments:
   // 
   //  url - (String) A valid URL for params to be merged into. This URL may
   //    contain a query string and/or fragment (hash).
-  //  params - (Object) An object, params string, or URL containing fragment
-  //    (hash) params to be merged into the URL.
+  //  params - (String) A params string or URL containing fragment (hash) params
+  //    to be merged into url.
+  //  params - (Object) A params object to be merged into url.
   //  merge_mode - (Number) Merge behavior defaults to 0 if merge_mode is not
   //    specified, and is as-follows:
   // 
-  //    * 0: params argument will override any params in url.
-  //    * 1: any params in url will override params argument.
-  //    * 2: params argument will completely replace any params in url.
+  //    * 0: params in the params argument will override any fragment (hash)
+  //         params in url.
+  //    * 1: any fragment (hash) params in url will override params in the
+  //         params argument.
+  //    * 2: params argument will completely replace any query string in url.
   // 
   // Returns:
   // 
   //  (String) Either a params string with urlencoded data or a URL with a
   //    urlencoded fragment (hash) in the format 'a=b&c=d&e=f'.
   
-  function jq_param_sub( is_fragment, re, params_or_url, params, merge_mode ) {
+  function jq_param_sub( is_fragment, re, url, params, merge_mode ) {
     var result,
       qs,
       matches,
@@ -189,45 +203,46 @@
       // Build URL by merging params into url string.
       
       // matches[1] = url part that precedes params, not including trailing ?/#
-      // matches[2] = params
-      // matches[3] = hash, if in 'querystring' mode, including leading #
-      matches = params_or_url.match( is_fragment ? /^([^#]*)\#?(.*)$/ : /^([^#?]*)\??([^#]*)(#?.*)/ );
-      
-      // Convert relevant params in params_or_url to object.
-      url_params = jq_deparam( matches[2] );
+      // matches[2] = params, not including leading ?/#
+      // matches[3] = if in 'querystring' mode, hash including leading #, otherwise ''
+      matches = url.match( is_fragment ? /^([^#]*)\#?(.*)$/ : /^([^#?]*)\??([^#]*)(#?.*)/ );
       
       // Get the hash if in 'querystring' mode, and it exists.
       hash = matches[3] || '';
       
-      params = is_string( params )
+      if ( merge_mode === 2 && is_string( params ) ) {
+        // If merge_mode is 2 and params is a string, merge the fragment / query
+        // string into the URL wholesale, without converting it into an object.
+        qs = params.replace( re, '' );
         
-        // Convert passed params string into object.
-        ? jq_deparam[ is_fragment ? str_fragment : str_querystring ]( params )
+      } else {
+        // Convert relevant params in url to object.
+        url_params = jq_deparam( matches[2] );
         
-        // Passed params object.
-        : params;
-      
-      qs = merge_mode === 2 ? params                              // passed params replace url params
-        : merge_mode === 1  ? $.extend( {}, params, url_params )  // url params override passed params
-        : $.extend( {}, url_params, params );                     // passed params override url params
-      
-      // Convert params object to a string.
-      qs = jq_param( qs );
+        params = is_string( params )
+          
+          // Convert passed params string into object.
+          ? jq_deparam[ is_fragment ? str_fragment : str_querystring ]( params )
+          
+          // Passed params object.
+          : params;
+        
+        qs = merge_mode === 2 ? params                              // passed params replace url params
+          : merge_mode === 1  ? $.extend( {}, params, url_params )  // url params override passed params
+          : $.extend( {}, url_params, params );                     // passed params override url params
+        
+        // Convert params object to a string.
+        qs = jq_param( qs );
+      }
       
       // Build URL from the base url, querystring and hash. In 'querystring'
       // mode, ? is only added if a query string exists. In 'fragment' mode, #
       // is always added.
       result = matches[1] + ( is_fragment ? '#' : qs || !matches[1] ? '?' : '' ) + qs + hash;
       
-    } else if ( params_or_url ) {
-      // Serialize params obj, or parse params from URL string.
-      result = is_string( params_or_url )
-        
-        // Parse params out of string.
-        ? params_or_url.replace( re, '' )
-        
-        // Call $.param on object.
-        : jq_param( params_or_url );
+    } else if ( url ) {
+      // Parse params from URL string.
+      result = url.replace( re, '' );
       
     } else {
       result = is_fragment
@@ -246,19 +261,21 @@
   jq_param[ str_querystring ]                  = curry( jq_param_sub, 0, re_trim_querystring );
   jq_param[ str_fragment ] = jq_param_fragment = curry( jq_param_sub, 1, re_trim_fragment );
   
+  // Section: Deparam (from string)
+  // 
   // Method: jQuery.deparam
   // 
   // Deserialize a params string into an object, optionally coercing numbers,
-  // booleans, null and undefined values. This method is the counterpart to the
+  // booleans, null and undefined values; this method is the counterpart to the
   // internal jQuery.param method.
   // 
   // Usage:
   // 
-  //  jQuery.deparam( params_str [, coerce ] );                              - -
+  // > jQuery.deparam( params [, coerce ] );
   // 
   // Arguments:
   // 
-  //  params_str - (String) A params string to be parsed.
+  //  params - (String) A params string to be parsed.
   //  coerce - (Boolean) If true, coerces any numbers or true, false, null, and
   //    undefined to their actual value. Defaults to false.
   // 
@@ -269,11 +286,6 @@
   $.deparam = jq_deparam = function( params, coerce ) {
     var obj = {},
       coerce_types = { 'true': !0, 'false': !1, 'null': null };
-    
-    // If params is an object, serialize it first.
-    params = is_string( params )
-      ? params
-      : jq_param( params );
     
     // Iterate over all name=value pairs.
     $.each( params.replace( /\+/g, ' ' ).split( '&' ), function(j,v){
@@ -365,18 +377,18 @@
   
   // Method: jQuery.deparam.querystring
   // 
-  // Parse the query string from a URL or the current document, deserializing
-  // it into an object, optionally coercing numbers, booleans, null and
-  // undefined values.
+  // Parse the query string from a URL or the current document.location,
+  // deserializing it into an object, optionally coercing numbers, booleans,
+  // null and undefined values.
   // 
   // Usage:
   // 
-  //  jQuery.deparam.querystring( [ url ] [, coerce ] );                     - -
+  // > jQuery.deparam.querystring( [ url ] [, coerce ] );
   // 
   // Arguments:
   // 
   //  url - (String) A params string or URL containing query string params to be
-  //    parsed, or an object to be serialized.
+  //    parsed.
   //  coerce - (Boolean) If true, coerces any numbers or true, false, null, and
   //    undefined to their actual value. Defaults to false.
   // 
@@ -386,18 +398,18 @@
   
   // Method: jQuery.deparam.fragment
   // 
-  // Parse the fragment (hash) from a URL or the current document, deserializing
-  // it into an object, optionally coercing numbers, booleans, null and
-  // undefined values.
+  // Parse the fragment (hash) from a URL or the current document.location,
+  // deserializing it into an object, optionally coercing numbers, booleans,
+  // null and undefined values.
   // 
   // Usage:
   // 
-  //  jQuery.deparam.fragment( [ url ] [, coerce ] );                        - -
+  // > jQuery.deparam.fragment( [ url ] [, coerce ] );
   // 
   // Arguments:
   // 
   //  url - (String) A params string or URL containing fragment (hash) params to
-  //    be parsed, or an object to be serialized.
+  //    be parsed.
   //  coerce - (Boolean) If true, coerces any numbers or true, false, null, and
   //    undefined to their actual value. Defaults to false.
   // 
@@ -422,75 +434,86 @@
   jq_deparam[ str_querystring ]                    = curry( jq_deparam_sub, str_querystring, re_trim_querystring );
   jq_deparam[ str_fragment ] = jq_deparam_fragment = curry( jq_deparam_sub, str_fragment, re_trim_fragment );
   
-  // Method: jQuery.param.urlAttr
+  // Section: Element manipulation
+  // 
+  // Method: jQuery.elemUrlAttr
   // 
   // Get the internal "Default URL attribute per tag" list, or augment the list
   // with additional tag-attribute pairs, in case the defaults are insufficient.
   // 
-  // In the <jQuery.fn.querystring> and <jQuery.fn.fragment> methods, this list is used to
-  // determine which attribute contains the URL to be modified.
+  // In the <jQuery.fn.querystring> and <jQuery.fn.fragment> methods, this list
+  // is used to determine which attribute contains the URL to be modified, if
+  // an "attr" param is not specified.
   // 
-  // Default List:
+  // Default Tag-Attribute List:
   // 
-  //  TAG    - URL ATTRIBUTE
   //  a      - href
   //  base   - href
   //  iframe - src
   //  img    - src
+  //  input  - src
   //  form   - action
   //  link   - href
   //  script - src
   // 
   // Usage:
   // 
-  //  jQuery.param.urlAttr( [ tag_attr_obj ] );                             - -
+  // > jQuery.elemUrlAttr( [ tag_attr ] );
   // 
   // Arguments:
   // 
-  //  tag_attr_obj - (Object) An list of tag names and associated default
-  //    attribute names in the format { tag: 'attr', tag: 'attr', ... }.
+  //  tag_attr - (Object) An object containing a list of tag names and their
+  //    associated default attribute names in the format { tag: 'attr', ... } to
+  //    be merged into the internal tag-attribute list.
   // 
   // Returns:
   // 
-  //  (Object) The current internal "Default URL attribute per tag" list.
+  //  (Object) An object containing all stored tag-attribute values.
   
-  (jq_param.urlAttr = function( attr_obj ) {
-    return $.extend( tag_attr, attr_obj );
+  // Only define function and set defaults if function doesn't already exist, as
+  // the urlInternal plugin will provide this method as well.
+  $[ str_elemUrlAttr ] || ($[ str_elemUrlAttr ] = function( obj ) {
+    return $.extend( elemUrlAttr_cache, obj );
   })({
-    // Set some reasonable defaults.
     a: str_href,
     base: str_href,
     iframe: str_src,
     img: str_src,
+    input: str_src,
     form: 'action',
     link: str_href,
     script: str_src
   });
   
+  jq_elemUrlAttr = $[ str_elemUrlAttr ];
+  
   // Method: jQuery.fn.querystring
   // 
   // Update URL attribute in one or more elements, merging the current URL (with
-  // or without pre-existing params) plus any params object or string into a new
-  // URL, which is then set into that attribute. Like <jQuery.param.querystring (build
-  // url)>, but for all elements in a jQuery collection.
+  // or without pre-existing query string params) plus any params object or
+  // string into a new URL, which is then set into that attribute. Like
+  // <jQuery.param.querystring (build url)>, but for all elements in a jQuery
+  // collection.
   // 
   // Usage:
   // 
-  //  jQuery('selector').querystring( [ attr, ] params [, merge_mode ] );    - -
+  // > jQuery('selector').querystring( [ attr, ] params [, merge_mode ] );
   // 
   // Arguments:
   // 
   //  attr - (String) Optional name of an attribute that will contain a URL to
-  //    merge params into. See <jQuery.param.urlAttr> for a list of default
+  //    merge params or url into. See <jQuery.elemUrlAttr> for a list of default
   //    attributes.
-  //  params - (String or Object) Either a serialized params string or a params
-  //    object to be merged into the URL.
+  //  params - (Object) A params object to be merged into the URL attribute.
+  //  params - (String) A URL containing query string params, or params string
+  //    to be merged into the URL attribute.
   //  merge_mode - (Number) Merge behavior defaults to 0 if merge_mode is not
   //    specified, and is as-follows:
   //    
-  //    * 0: params argument will override any params in attr URL.
-  //    * 1: any params in attr URL will override params argument.
-  //    * 2: params argument will completely replace any params in attr URL.
+  //    * 0: params in the params argument will override any params in attr URL.
+  //    * 1: any params in attr URL will override params in the params argument.
+  //    * 2: params argument will completely replace any query string in attr
+  //         URL.
   // 
   // Returns:
   // 
@@ -500,27 +523,30 @@
   // Method: jQuery.fn.fragment
   // 
   // Update URL attribute in one or more elements, merging the current URL (with
-  // or without pre-existing params) plus any params object or string into a new
-  // URL, which is then set into that attribute. Like <jQuery.param.fragment (build
-  // url)>, but for all elements in a jQuery collection.
+  // or without pre-existing fragment/hash params) plus any params object or
+  // string into a new URL, which is then set into that attribute. Like
+  // <jQuery.param.fragment (build url)>, but for all elements in a jQuery
+  // collection.
   // 
   // Usage:
   // 
-  //  jQuery('selector').fragment( [ attr, ] params [, merge_mode ] );       - -
+  // > jQuery('selector').fragment( [ attr, ] params [, merge_mode ] );
   // 
   // Arguments:
   // 
   //  attr - (String) Optional name of an attribute that will contain a URL to
-  //    merge params into. See <jQuery.param.urlAttr> for a list of default
+  //    merge params into. See <jQuery.elemUrlAttr> for a list of default
   //    attributes.
-  //  params - (String or Object) Either a serialized params string or a params
-  //    object to be merged into the URL.
+  //  params - (Object) A params object to be merged into the URL attribute.
+  //  params - (String) A URL containing fragment (hash) params, or params
+  //    string to be merged into the URL attribute.
   //  merge_mode - (Number) Merge behavior defaults to 0 if merge_mode is not
   //    specified, and is as-follows:
   //    
-  //    * 0: params argument will override any params in attr URL.
-  //    * 1: any params in attr URL will override params argument.
-  //    * 2: params argument will completely replace any params in attr URL.
+  //    * 0: params in the params argument will override any params in attr URL.
+  //    * 1: any params in attr URL will override params in the params argument.
+  //    * 2: params argument will completely replace any fragment (hash) in attr
+  //         URL.
   // 
   // Returns:
   // 
@@ -538,8 +564,8 @@
     return this.each(function(){
       var that = $(this),
         
-        // Get attribute specified, or default specified via $.param.urlAttr.
-        attr = force_attr || tag_attr[ ( this.nodeName || '' ).toLowerCase() ],
+        // Get attribute specified, or default specified via $.elemUrlAttr.
+        attr = force_attr || jq_elemUrlAttr()[ ( this.nodeName || '' ).toLowerCase() ] || '',
         
         // Get URL value.
         url = attr && that.attr( attr ) || '';
@@ -553,52 +579,64 @@
   $.fn[ str_querystring ] = curry( jq_fn_sub, str_querystring );
   $.fn[ str_fragment ]    = curry( jq_fn_sub, str_fragment );
   
-  // Method: jQuery.history.add
+  // Section: History, hashchange event
+  // 
+  // Method: jQuery.history.pushState
   // 
   // Adds a 'state' into the browser history at the current position, setting
-  // location.hash, and triggering any bound <window.onhashchange> event
+  // location.hash and triggering any bound <window.onhashchange> event
   // callbacks (provided the new state is different than the previous state).
+  // 
+  // If no arguments are passed, an empty state is created, which is just a
+  // shortcut for $.history.pushState( {}, 2 ).
   // 
   // Usage:
   // 
-  //  jQuery.history.add( [ params [, merge_mode ] ] );                      - -
+  // > jQuery.history.pushState( [ params [, merge_mode ] ] );
   // 
   // Arguments:
   // 
-  //  params - (String or Object) Either a hash string beginning with #, a
-  //    serialized params string or a data object to set as the current history
-  //    state (location.hash). If omitted, sets the document hash to # (this is
-  //    just a shortcut for $.history.add( {}, 2 ) and may cause your browser to
-  //    scroll). If a hash string beginning with # is specified, will completely
-  //    overwrite the existing hash.
+  //  params - (String) A serialized params string or a hash string beginning
+  //    with # to merge into location.hash.
+  //  params - (Object) A params object to merge into location.hash.
   //  merge_mode - (Number) Merge behavior defaults to 0 if merge_mode is not
-  //    specified, and is as-follows:
+  //    specified (unless a hash string beginning with # is specified, in which
+  //    case merge behavior defaults to 2), and is as-follows:
   // 
-  //    * 0: params argument will override any params in document hash.
-  //    * 1: any params in document hash will override params argument.
-  //    * 2: params argument will completely replace any params in document
-  //      hash.
+  //    * 0: params in the params argument will override any params in the
+  //         current state.
+  //    * 1: any params in the current state will override params in the params
+  //         argument.
+  //    * 2: params argument will completely replace current state.
   // 
   // Returns:
   // 
   //  Nothing.
+  // 
+  // Additional Notes:
+  // 
+  //  * Setting an empty state may cause the browser to scroll.
+  //  * Unlike the fragment and querystring methods, if a hash string beginning
+  //    with # is specified as the params agrument, merge_mode defaults to 2.
   
-  jq_history.add = jq_history_add = function( params, merge_mode ) {
+  jq_history.pushState = jq_history_pushState = function( params, merge_mode ) {
+    if ( is_string( params ) && /^#/.test( params ) && merge_mode === undefined ) {
+      // Params string begins with # and merge_mode not specified, so completely
+      // overwrite document.location.hash.
+      merge_mode = 2;
+    }
+    
     var has_args = params !== undefined,
-      url = is_string( params ) && /^#/.test( params )
-        
-        // Params string begins with #, so overwrite document.location hash.
-        ? loc[ str_href ].replace( /#.*$/, '' ) + params
-        
-        // Otherwise merge params into document.location using $.param.fragment.
-        : jq_param_fragment( loc[ str_href ], has_args ? params : {}, has_args ? merge_mode : 2 );
+      // Merge params into document.location using $.param.fragment.
+      url = jq_param_fragment( loc[ str_href ], has_args ? params : {}, has_args ? merge_mode : 2 );
     
     // Set new document.location.href. If hash is empty, use just # to prevent
-    // browser from reloading the page.
+    // browser from reloading the page. Note that Safari 3 & Chrome barf on
+    // location.hash = '#'.
     loc[ str_href ] = url + ( /#/.test( url ) ? '' : '#' );
   };
   
-  // Method: jQuery.history.retrieve
+  // Method: jQuery.history.getState
   // 
   // Retrieves the current 'state' from the browser history, parsing
   // location.hash for a specific key or returning an object containing the
@@ -607,7 +645,7 @@
   // 
   // Usage:
   // 
-  //  jQuery.history.retrieve( [ key ] [, coerce ] );                        - -
+  // > jQuery.history.getState( [ key ] [, coerce ] );
   // 
   // Arguments:
   // 
@@ -621,7 +659,7 @@
   //    in the location.hash 'state', or undefined. If not, an object
   //    representing the entire 'state' is returned.
   
-  jq_history.retrieve = function( key, coerce ) {
+  jq_history.getState = function( key, coerce ) {
     return key === undefined || typeof key === 'boolean'
       ? jq_deparam_fragment( key ) // 'key' really means 'coerce' here
       : jq_deparam_fragment( coerce )[ key ];
@@ -638,37 +676,53 @@
   // 
   // Fired when document.location.hash changes. In browsers that support it, the
   // native window.onhashchange event is used (IE8, FF3.6), otherwise a polling
-  // loop is initialized and runs every <jQuery.history.pollDelay> milliseconds
+  // loop is initialized, running every <jQuery.history.pollDelay> milliseconds
   // to see if the hash has changed. In IE 6 and 7, a hidden IFRAME is created
   // to allow hash-based history to work.
   // 
-  // Notes:
+  // Usage in 1.4pre and newer:
+  // 
+  // In 1.4pre and newer, the event object that is passed into the callback is
+  // augmented with an additional e.fragment property that contains the current
+  // document location.hash state as a string, as well as an e.getState method.
+  // 
+  // e.fragment is equivalent to the output of <jQuery.param.fragment>, and
+  // e.getState() is equivalent to <jQuery.history.getState>, except that they
+  // refer to the event-specific state value stored in the event object, instead
+  // of the current document.location, allowing the event object to be
+  // referenced later, even if document.location has changed.
+  // 
+  // > $(window).bind( 'hashchange', function(e) {
+  // >   var hash_str = e.fragment,
+  // >     param_obj = e.getState(),
+  // >     param_val = e.getState( 'param_name' ),
+  // >     param_val_coerced = e.getState( 'param_name', true );
+  // >   ...
+  // > });
+  // 
+  // Usage in 1.3.2:
+  // 
+  // In 1.3.2, the event object is unable to be augmented as in 1.4pre+, so the
+  // fragment state isn't bound to the event object and must instead be parsed
+  // using the <jQuery.param.fragment> and <jQuery.history.getState> methods.
+  // 
+  // > $(window).bind( 'hashchange', function(e) {
+  // >   var hash_str = $.param.fragment(),
+  // >     param_obj = $.history.getState(),
+  // >     param_val = $.history.getState( 'param_name' ),
+  // >     param_val_coerced = $.history.getState( 'param_name', true );
+  // >   ...
+  // > });
+  // 
+  // Additional Notes:
   // 
   // * The polling loop and iframe are not created until at least one callback
   //   is actually bound to 'hashchange'.
   // * If you need the bound callback(s) to execute immediately, in cases where
   //   the page 'state' exists on page load (via bookmark or page refresh, for
   //   example) use $(window).trigger( 'hashchange' );
-  // 
-  // Usage in 1.3.2:
-  // 
-  // > $(window).bind( 'hashchange', function() {
-  // >   var hash_str = $.param.fragment(),
-  // >     param_obj = $.history.retrieve(),
-  // >     param_val = $.history.retrieve( 'param_name' );
-  // >   ...
-  // > });
-  // 
-  // Usage in 1.3.3+:
-  // 
-  // > $(window).bind( 'hashchange', function(e) {
-  // >   var hash_str = e.hash,
-  // >     param_obj = e.retrieve(),
-  // >     param_val = e.retrieve( 'param_name' );
-  // >   ...
-  // > });
   
-  $.event.special[ hashchange ] = {
+  $.event.special[ str_hashchange ] = {
     
     // Called only when the first 'hashchange' event is bound to window.
     setup: function() {
@@ -684,22 +738,22 @@
       // If window.onhashchange is supported natively, there's nothing to do..
       if ( supports_onhashchange ) { return false; }
       
-      // Otherwise, we need to create our own.
+      // Otherwise, we need to stop ours, if possible.
       fake_onhashchange.stop();
     },
     
-    // Augmenting the event object with the .hash property and .retrieve method
-    // requires jQuery 1.3.3 or newer. Note: with 1.3.2, everything will work,
-    // but the event won't be augmented)
+    // Augmenting the event object with the .fragment property and .getState
+    // method requires jQuery 1.4 or newer. Note: with 1.3.2, everything will
+    // work, but the event won't be augmented)
     add: function( handler, data, namespaces ) {
       return function(e) {
-        // e.hash is set to the value of location.hash (with any leading #
+        // e.fragment is set to the value of location.hash (with any leading #
         // removed) at the time the event is triggered.
-        var hash = e[ str_hash ] = jq_param_fragment();
+        var hash = e[ str_fragment ] = jq_param_fragment();
         
-        // e.retrieve() works just like $.history.retrieve(), but uses e.hash
-        // stored in the event object.
-        e.retrieve = function( key, coerce ) {
+        // e.getState() works just like $.history.getState(), but uses the
+        // e.fragment property stored on the event object.
+        e.getState = function( key, coerce ) {
           return key === undefined || typeof key === 'boolean'
             ? jq_deparam( hash, key ) // 'key' really means 'coerce' here
             : jq_deparam( hash, coerce )[ key ];
@@ -717,14 +771,13 @@
   fake_onhashchange = (function(){
     var self = {},
       timeout_id,
-      stop,
+      iframe,
       set_history,
       get_history;
     
     // Initialize. In IE 6/7, creates a hidden IFRAME for history handling.
     function init(){
-      var iframe,
-        browser = $.browser;
+      var browser = $.browser;
       
       // Most browsers don't need special methods here..
       set_history = get_history = function(val){ return val; };
@@ -758,8 +811,8 @@
     
     // Start the polling loop.
     self.start = function() {
-      // First, stop the polling loop if it's already running (it shouldn't be).
-      stop();
+      // Polling loop is already running!
+      if ( timeout_id ) { return; }
       
       // Remember the initial hash so it doesn't get triggered immediately.
       var last_hash = jq_param_fragment();
@@ -777,20 +830,24 @@
         if ( hash !== last_hash ) {
           set_history( last_hash = hash, history_hash );
           
-          $(window).trigger( hashchange );
+          $(window).trigger( str_hashchange );
           
         } else if ( history_hash !== last_hash ) {
-          jq_history_add( '#' + history_hash, 2 );
+          jq_history_pushState( '#' + history_hash );
         }
         
         timeout_id = setTimeout( loopy, jq_history.pollDelay );
       })();
     };
     
-    // Stop the polling loop.
-    stop = self.stop = function() {
-      timeout_id && clearTimeout( timeout_id );
-      timeout_id = 0;
+    // Stop the polling loop, but only if an IE6/7 IFRAME wasn't created. In
+    // that case, even if there are no longer any bound event handlers, the
+    // polling loop is still necessary for back/next to work at all!
+    self.stop = function() {
+      if ( !iframe ) {
+        timeout_id && clearTimeout( timeout_id );
+        timeout_id = 0;
+      }
     };
     
     return self;
