@@ -1,5 +1,5 @@
 /*!
- * jQuery BBQ: Back Button & Query Library - v0.1pre - 9/27/2009
+ * jQuery BBQ: Back Button & Query Library - v0.1pre - 9/28/2009
  * http://benalman.com/projects/jquery-bbq-plugin/
  * 
  * Copyright (c) 2009 "Cowboy" Ben Alman
@@ -9,7 +9,7 @@
 
 // Script: jQuery BBQ: Back Button & Query Library
 //
-// *Version: 0.1pre, Last updated: 9/27/2009*
+// *Version: 0.1pre, Last updated: 9/28/2009*
 // 
 // Home       - http://benalman.com/projects/jquery-bbq-plugin/
 // GitHub     - http://github.com/cowboy/jquery-bbq/
@@ -85,9 +85,8 @@
   
   // Why write the same function twice? Let's curry! Mmmm, curry..
   
-  function curry() {
-    var args = aps.call( arguments ),
-      func = args.shift();
+  function curry( func ) {
+    var args = aps.call( arguments, 1 );
     
     return function() {
       return func.apply( this, args.concat( aps.call( arguments ) ) );
@@ -729,7 +728,9 @@
       // If window.onhashchange is supported natively, there's nothing to do..
       if ( supports_onhashchange ) { return false; }
       
-      // Otherwise, we need to create our own.
+      // Otherwise, we need to create our own. And we don't want to call this
+      // until the user binds to the event, just in case they never do, since it
+      // will create a polling loop and possibly even a hidden IFRAME.
       fake_onhashchange.start();
     },
     
@@ -738,7 +739,7 @@
       // If window.onhashchange is supported natively, there's nothing to do..
       if ( supports_onhashchange ) { return false; }
       
-      // Otherwise, we need to stop ours, if possible.
+      // Otherwise, we need to stop ours (if possible).
       fake_onhashchange.stop();
     },
     
