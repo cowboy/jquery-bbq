@@ -1,5 +1,5 @@
 /*!
- * jQuery BBQ: Back Button & Query Library - v0.1pre - 9/28/2009
+ * jQuery BBQ: Back Button & Query Library - v0.1pre - 9/30/2009
  * http://benalman.com/projects/jquery-bbq-plugin/
  * 
  * Copyright (c) 2009 "Cowboy" Ben Alman
@@ -9,7 +9,7 @@
 
 // Script: jQuery BBQ: Back Button & Query Library
 //
-// *Version: 0.1pre, Last updated: 9/28/2009*
+// *Version: 0.1pre, Last updated: 9/30/2009*
 // 
 // Home       - http://benalman.com/projects/jquery-bbq-plugin/
 // GitHub     - http://github.com/cowboy/jquery-bbq/
@@ -22,6 +22,16 @@
 // Licensed under the MIT license.
 // http://benalman.com/about/license/
 // 
+// About: Examples
+// 
+// These working examples, complete with fully commented code, illustrate a few
+// ways in which this plugin can be used.
+// 
+// Basic AJAX     - http://benalman.com/code/projects/jquery-bbq/examples/fragment-basic/
+// Advanced AJAX  - http://benalman.com/code/projects/jquery-bbq/examples/fragment-advanced/
+// jQuery UI Tabs - COMING SOON
+// Deparam        - COMING SOON
+// 
 // About: Support and Testing
 // 
 // Information about what version or versions of jQuery this plugin has been
@@ -30,20 +40,17 @@
 // 
 // jQuery Versions - 1.3.2, 1.4pre
 // Browsers Tested - Internet Explorer 6-8, Firefox 2-3.6, Safari 3-4, Chrome, Opera 9.6-10.
-// Unit Tests      - http://benalman.com/code/projects/jquery-bbq/unit/test.html
+// Unit Tests      - http://benalman.com/code/projects/jquery-bbq/unit/
 // 
-// About: Revision History
+// About: Release History
 // 
-// 0.1pre - Pre-initial release
+// 0.1pre - (9/30/2009) Pre-initial release
 
-(function($){
+(function($,window){
   '$:nomunge'; // Used by YUI compressor.
   
-  // A few constants.
-  var window = this,
-    undefined,
-    
-    // Some convenient shortcuts.
+  // Some convenient shortcuts.
+  var undefined,
     loc = document.location,
     aps = Array.prototype.slice,
     decode = decodeURIComponent,
@@ -53,8 +60,8 @@
     jq_param_fragment,
     jq_deparam,
     jq_deparam_fragment,
-    jq_history = $.history = $.history || {},
-    jq_history_pushState,
+    jq_bbq = $.bbq = $.bbq || {},
+    jq_bbq_pushState,
     jq_elemUrlAttr,
     fake_onhashchange,
     
@@ -580,18 +587,18 @@
   
   // Section: History, hashchange event
   // 
-  // Method: jQuery.history.pushState
+  // Method: jQuery.bbq.pushState
   // 
   // Adds a 'state' into the browser history at the current position, setting
   // location.hash and triggering any bound <window.onhashchange> event
   // callbacks (provided the new state is different than the previous state).
   // 
   // If no arguments are passed, an empty state is created, which is just a
-  // shortcut for $.history.pushState( {}, 2 ).
+  // shortcut for jQuery.bbq.pushState( {}, 2 ).
   // 
   // Usage:
   // 
-  // > jQuery.history.pushState( [ params [, merge_mode ] ] );
+  // > jQuery.bbq.pushState( [ params [, merge_mode ] ] );
   // 
   // Arguments:
   // 
@@ -618,7 +625,7 @@
   //  * Unlike the fragment and querystring methods, if a hash string beginning
   //    with # is specified as the params agrument, merge_mode defaults to 2.
   
-  jq_history.pushState = jq_history_pushState = function( params, merge_mode ) {
+  jq_bbq.pushState = jq_bbq_pushState = function( params, merge_mode ) {
     if ( is_string( params ) && /^#/.test( params ) && merge_mode === undefined ) {
       // Params string begins with # and merge_mode not specified, so completely
       // overwrite document.location.hash.
@@ -635,7 +642,7 @@
     loc[ str_href ] = url + ( /#/.test( url ) ? '' : '#' );
   };
   
-  // Method: jQuery.history.getState
+  // Method: jQuery.bbq.getState
   // 
   // Retrieves the current 'state' from the browser history, parsing
   // location.hash for a specific key or returning an object containing the
@@ -644,7 +651,7 @@
   // 
   // Usage:
   // 
-  // > jQuery.history.getState( [ key ] [, coerce ] );
+  // > jQuery.bbq.getState( [ key ] [, coerce ] );
   // 
   // Arguments:
   // 
@@ -658,25 +665,25 @@
   //    in the location.hash 'state', or undefined. If not, an object
   //    representing the entire 'state' is returned.
   
-  jq_history.getState = function( key, coerce ) {
+  jq_bbq.getState = function( key, coerce ) {
     return key === undefined || typeof key === 'boolean'
       ? jq_deparam_fragment( key ) // 'key' really means 'coerce' here
       : jq_deparam_fragment( coerce )[ key ];
   };
   
-  // Property: jQuery.history.pollDelay
+  // Property: jQuery.bbq.pollDelay
   // 
-  // The numeric speed (in milliseconds) at which the <window.onhashchange>
-  // polling loop polls. Defaults to 100.
+  // The numeric interval (in milliseconds) at which the <window.onhashchange>
+  // polling loop executes. Defaults to 100.
   
-  jq_history.pollDelay = 100;
+  jq_bbq.pollDelay = 100;
   
   // Event: window.onhashchange
   // 
   // Fired when document.location.hash changes. In browsers that support it, the
   // native window.onhashchange event is used (IE8, FF3.6), otherwise a polling
-  // loop is initialized, running every <jQuery.history.pollDelay> milliseconds
-  // to see if the hash has changed. In IE 6 and 7, a hidden IFRAME is created
+  // loop is initialized, running every <jQuery.bbq.pollDelay> milliseconds to
+  // see if the hash has changed. In IE 6 and 7, a hidden IFRAME is created
   // to allow hash-based history to work.
   // 
   // Usage in 1.4pre and newer:
@@ -686,10 +693,10 @@
   // document location.hash state as a string, as well as an e.getState method.
   // 
   // e.fragment is equivalent to the output of <jQuery.param.fragment>, and
-  // e.getState() is equivalent to <jQuery.history.getState>, except that they
-  // refer to the event-specific state value stored in the event object, instead
-  // of the current document.location, allowing the event object to be
-  // referenced later, even if document.location has changed.
+  // e.getState() is equivalent to <jQuery.bbq.getState>, except that they refer
+  // to the event-specific state value stored in the event object, instead of
+  // the current document.location, allowing the event object to be referenced
+  // later, even if document.location has changed.
   // 
   // > $(window).bind( 'hashchange', function(e) {
   // >   var hash_str = e.fragment,
@@ -703,13 +710,13 @@
   // 
   // In 1.3.2, the event object is unable to be augmented as in 1.4pre+, so the
   // fragment state isn't bound to the event object and must instead be parsed
-  // using the <jQuery.param.fragment> and <jQuery.history.getState> methods.
+  // using the <jQuery.param.fragment> and <jQuery.bbq.getState> methods.
   // 
   // > $(window).bind( 'hashchange', function(e) {
   // >   var hash_str = $.param.fragment(),
-  // >     param_obj = $.history.getState(),
-  // >     param_val = $.history.getState( 'param_name' ),
-  // >     param_val_coerced = $.history.getState( 'param_name', true );
+  // >     param_obj = $.bbq.getState(),
+  // >     param_val = $.bbq.getState( 'param_name' ),
+  // >     param_val_coerced = $.bbq.getState( 'param_name', true );
   // >   ...
   // > });
   // 
@@ -752,7 +759,7 @@
         // removed) at the time the event is triggered.
         var hash = e[ str_fragment ] = jq_param_fragment();
         
-        // e.getState() works just like $.history.getState(), but uses the
+        // e.getState() works just like $.bbq.getState(), but uses the
         // e.fragment property stored on the event object.
         e.getState = function( key, coerce ) {
           return key === undefined || typeof key === 'boolean'
@@ -821,8 +828,8 @@
       // Initialize if not yet initialized.
       set_history || init();
       
-      // This polling loop checks every $.history.pollDelay milliseconds to see
-      // if location.hash has changed, and triggers the 'hashchange' event on
+      // This polling loop checks every $.bbq.pollDelay milliseconds to see if
+      // location.hash has changed, and triggers the 'hashchange' event on
       // window when necessary.
       (function loopy(){
         var hash = jq_param_fragment(),
@@ -834,10 +841,10 @@
           $(window).trigger( str_hashchange );
           
         } else if ( history_hash !== last_hash ) {
-          jq_history_pushState( '#' + history_hash );
+          jq_bbq_pushState( '#' + history_hash );
         }
         
-        timeout_id = setTimeout( loopy, jq_history.pollDelay );
+        timeout_id = setTimeout( loopy, jq_bbq.pollDelay );
       })();
     };
     
@@ -854,4 +861,4 @@
     return self;
   })();
   
-})(jQuery);
+})(jQuery,this);

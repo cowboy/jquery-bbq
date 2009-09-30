@@ -5,7 +5,7 @@
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
   <title>jQuery BBQ: Back Button & Query Library - Unit Tests</title>
 
-<script type="text/javascript" src="http://benalman.com/code/jquery/dist/jquery.js"></script>
+<script type="text/javascript" src="../shared/jquery-1.4pre.js"></script>
 <script type="text/javascript" src="testrunner.js"></script>
 <link rel="stylesheet" href="testsuite.css">
 
@@ -625,40 +625,40 @@ test( 'jQuery.fn.fragment', function() {
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-module( 'jQuery.history' );
+module( 'jQuery.bbq' );
 
-test( 'jQuery.history.pushState(), jQuery.history.getState(), window.onhashchange', function() {
+test( 'jQuery.bbq.pushState(), jQuery.bbq.getState(), window.onhashchange', function() {
   expect( old_param ? 43 : 73 );
   
   var a, b, c, d, e, f, x, y, hash, obj, event, msg = 'Testing history';
   
-  $.history.pushState();
+  $.bbq.pushState();
   equals( document.location.hash.replace( /^#/, ''), '', 'document.location hash should be empty' );
   
-  $.history.pushState({ a:'1', b:'1' });
+  $.bbq.pushState({ a:'1', b:'1' });
   same( $.deparam.fragment(), { a:'1', b:'1' }, 'hash should be set properly' );
   
   $(window).bind( 'hashchange', function(evt) {
     var hash_str = $.param.fragment(),
-      param_obj = $.history.getState(),
-      param_val = $.history.getState( 'param_name' );
+      param_obj = $.bbq.getState(),
+      param_val = $.bbq.getState( 'param_name' );
     
     event = evt;
     hash = $.param.fragment();
-    obj = { str: $.history.getState(), coerce: $.history.getState( true ) };
-    a = { str: $.history.getState( 'a' ), coerce: $.history.getState( 'a', true ) };
-    b = { str: $.history.getState( 'b' ), coerce: $.history.getState( 'b', true ) };
-    c = { str: $.history.getState( 'c' ), coerce: $.history.getState( 'c', true ) };
-    d = { str: $.history.getState( 'd' ), coerce: $.history.getState( 'd', true ) };
-    e = { str: $.history.getState( 'e' ), coerce: $.history.getState( 'e', true ) };
-    f = { str: $.history.getState( 'f' ), coerce: $.history.getState( 'f', true ) };
+    obj = { str: $.bbq.getState(), coerce: $.bbq.getState( true ) };
+    a = { str: $.bbq.getState( 'a' ), coerce: $.bbq.getState( 'a', true ) };
+    b = { str: $.bbq.getState( 'b' ), coerce: $.bbq.getState( 'b', true ) };
+    c = { str: $.bbq.getState( 'c' ), coerce: $.bbq.getState( 'c', true ) };
+    d = { str: $.bbq.getState( 'd' ), coerce: $.bbq.getState( 'd', true ) };
+    e = { str: $.bbq.getState( 'e' ), coerce: $.bbq.getState( 'e', true ) };
+    f = { str: $.bbq.getState( 'f' ), coerce: $.bbq.getState( 'f', true ) };
     
   }).trigger( 'hashchange' );
   
-  same( obj.str, { a:'1', b:'1' }, 'hashchange triggered manually: $.history.getState()' );
-  same( obj.coerce, { a:1, b:1 },  'hashchange triggered manually: $.history.getState( true )' );
-  equals( a.str, '1', 'hashchange triggered manually: $.history.getState( "a" )' );
-  equals( a.coerce, 1, 'hashchange triggered manually: $.history.getState( "a", true )' );
+  same( obj.str, { a:'1', b:'1' }, 'hashchange triggered manually: $.bbq.getState()' );
+  same( obj.coerce, { a:1, b:1 },  'hashchange triggered manually: $.bbq.getState( true )' );
+  equals( a.str, '1', 'hashchange triggered manually: $.bbq.getState( "a" )' );
+  equals( a.coerce, 1, 'hashchange triggered manually: $.bbq.getState( "a", true )' );
   
   if ( !old_param ) {
     same( event.getState(), { a:'1', b:'1' }, 'hashchange triggered manually: event.getState()' );
@@ -674,7 +674,7 @@ test( 'jQuery.history.pushState(), jQuery.history.getState(), window.onhashchang
     // execute this for each array item
     function(){
       notice( msg += '.' );
-      $.history.pushState.apply( this, aps.call( arguments ) );
+      $.bbq.pushState.apply( this, aps.call( arguments ) );
     },
     
     // execute this at the end
@@ -687,10 +687,10 @@ test( 'jQuery.history.pushState(), jQuery.history.getState(), window.onhashchang
     [ { a:'2' } ],
     
     function(result){
-      same( obj.str, { a:'2', b:'1' }, '$.history.getState()' );
-      same( obj.coerce, { a:2, b:1 },  '$.history.getState( true )' );
-      equals( a.str, '2', '$.history.getState( "a" )' );
-      equals( a.coerce, 2, '$.history.getState( "a", true )' );
+      same( obj.str, { a:'2', b:'1' }, '$.bbq.getState()' );
+      same( obj.coerce, { a:2, b:1 },  '$.bbq.getState( true )' );
+      equals( a.str, '2', '$.bbq.getState( "a" )' );
+      equals( a.coerce, 2, '$.bbq.getState( "a", true )' );
       if ( !old_param ) {
         same( event.getState(), { a:'2', b:'1' }, 'event.getState()' );
         same( event.getState(true), { a:2, b:1 },  'event.getState( true )' );
@@ -702,10 +702,10 @@ test( 'jQuery.history.pushState(), jQuery.history.getState(), window.onhashchang
     [ { b:'2' } ],
     
     function(result){
-      same( obj.str, { a:'2', b:'2' }, '$.history.getState()' );
-      same( obj.coerce, { a:2, b:2 },  '$.history.getState( true )' );
-      equals( b.str, '2', '$.history.getState( "b" )' );
-      equals( b.coerce, 2, '$.history.getState( "b", true )' );
+      same( obj.str, { a:'2', b:'2' }, '$.bbq.getState()' );
+      same( obj.coerce, { a:2, b:2 },  '$.bbq.getState( true )' );
+      equals( b.str, '2', '$.bbq.getState( "b" )' );
+      equals( b.coerce, 2, '$.bbq.getState( "b", true )' );
       if ( !old_param ) {
         same( event.getState(), { a:'2', b:'2' }, 'event.getState()' );
         same( event.getState(true), { a:2, b:2 },  'event.getState( true )' );
@@ -717,16 +717,16 @@ test( 'jQuery.history.pushState(), jQuery.history.getState(), window.onhashchang
     [ { c:true, d:false, e:'undefined', f:'' } ],
     
     function(result){
-      same( obj.str, { a:'2', b:'2', c:'true', d:'false', e:'undefined', f:'' }, '$.history.getState()' );
-      same( obj.coerce, { a:2, b:2, c:true, d:false, e:undefined, f:'' },  '$.history.getState( true )' );
-      equals( c.str, 'true', '$.history.getState( "c" )' );
-      equals( c.coerce, true, '$.history.getState( "c", true )' );
-      equals( d.str, 'false', '$.history.getState( "d" )' );
-      equals( d.coerce, false, '$.history.getState( "d", true )' );
-      equals( e.str, 'undefined', '$.history.getState( "e" )' );
-      equals( e.coerce, undefined, '$.history.getState( "e", true )' );
-      equals( f.str, '', '$.history.getState( "f" )' );
-      equals( f.coerce, '', '$.history.getState( "f", true )' );
+      same( obj.str, { a:'2', b:'2', c:'true', d:'false', e:'undefined', f:'' }, '$.bbq.getState()' );
+      same( obj.coerce, { a:2, b:2, c:true, d:false, e:undefined, f:'' },  '$.bbq.getState( true )' );
+      equals( c.str, 'true', '$.bbq.getState( "c" )' );
+      equals( c.coerce, true, '$.bbq.getState( "c", true )' );
+      equals( d.str, 'false', '$.bbq.getState( "d" )' );
+      equals( d.coerce, false, '$.bbq.getState( "d", true )' );
+      equals( e.str, 'undefined', '$.bbq.getState( "e" )' );
+      equals( e.coerce, undefined, '$.bbq.getState( "e", true )' );
+      equals( f.str, '', '$.bbq.getState( "f" )' );
+      equals( f.coerce, '', '$.bbq.getState( "f", true )' );
       if ( !old_param ) {
         same( event.getState(), { a:'2', b:'2', c:'true', d:'false', e:'undefined', f:'' }, 'event.getState()' );
         same( event.getState(true), { a:2, b:2, c:true, d:false, e:undefined, f:'' },  'event.getState( true )' );
@@ -751,10 +751,10 @@ test( 'jQuery.history.pushState(), jQuery.history.getState(), window.onhashchang
           ? '[object Object]'
           : {x:[7], y:8, z:[9,0,true,false,undefined,'']};
       
-      same( obj.str, { a:['4','5','6'], b:b_str }, '$.history.getState()' );
-      same( obj.coerce, { a:[4,5,6], b:b_coerce },  '$.history.getState( true )' );
-      same( a.str, ['4','5','6'], '$.history.getState( "a" )' );
-      same( a.coerce, [4,5,6], '$.history.getState( "a", true )' );
+      same( obj.str, { a:['4','5','6'], b:b_str }, '$.bbq.getState()' );
+      same( obj.coerce, { a:[4,5,6], b:b_coerce },  '$.bbq.getState( true )' );
+      same( a.str, ['4','5','6'], '$.bbq.getState( "a" )' );
+      same( a.coerce, [4,5,6], '$.bbq.getState( "a", true )' );
       if ( !old_param ) {
         same( event.getState(), { a:['4','5','6'], b:b_str }, 'event.getState()' );
         same( event.getState(true), { a:[4,5,6], b:b_coerce },  'event.getState( true )' );
@@ -773,8 +773,8 @@ test( 'jQuery.history.pushState(), jQuery.history.getState(), window.onhashchang
           ? '[object Object]'
           : {x:[7], y:8, z:[9,0,true,false,undefined,'']};
       
-      same( obj.str, { a:['4','5','6'], b:b_str, c:'2' }, '$.history.getState()' );
-      same( obj.coerce, { a:[4,5,6], b:b_coerce, c:2 },  '$.history.getState( true )' );
+      same( obj.str, { a:['4','5','6'], b:b_str, c:'2' }, '$.bbq.getState()' );
+      same( obj.coerce, { a:[4,5,6], b:b_coerce, c:2 },  '$.bbq.getState( true )' );
       if ( !old_param ) {
         same( event.getState(), { a:['4','5','6'], b:b_str, c:'2' }, 'event.getState()' );
         same( event.getState(true), { a:[4,5,6], b:b_coerce, c:2 },  'event.getState( true )' );
@@ -862,7 +862,7 @@ test( 'jQuery.history.pushState(), jQuery.history.getState(), window.onhashchang
       if ( is_chrome ) {
         ok( true, 'history is sporadically broken in chrome, this seems to be a chrome bug' );
       } else {
-        same( x, ['almost_done', 'omg_ponies', '', '/path/to/file.php'], 'back button and window.history.go(-1) should work' );
+        same( x, ['almost_done', 'omg_ponies', '', '/path/to/file.php'], 'back button and window.bbq.go(-1) should work' );
       }
       
       $(window).unbind( 'hashchange' );
@@ -897,11 +897,11 @@ h3 {
 </head>
 <body>
 
-<h1>jQuery BBQ: Back Button & Query Library - Unit Tests (<a href="/projects/jquery-bbq-plugin/">documentation / source</a>)</h1>
+<h1>jQuery BBQ: Back Button & Query Library - Unit Tests (<a href="http://benalman.com/projects/jquery-bbq-plugin/">documentation / source</a>)</h1>
 <h2 id="banner"></h2>
 <h2 id="userAgent"></h2>
 
-<h3>These unit tests include jQuery <span id="jq_version">...</span>. To view the unit tests using jQuery 1.3.2, <a href="test-1.3.2.html">click here</a></h3>
+<h3>These unit tests include jQuery <span id="jq_version">...</span>. To view the unit tests using jQuery 1.3.2, <a href="jquery-1.3.2.html">click here</a></h3>
 
 <ol id="tests"></ol>
 <div id="main"></div>
