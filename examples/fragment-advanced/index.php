@@ -7,17 +7,6 @@ $shell['title2'] = "window.onhashchange » Advanced";
 $shell['h2'] = 'Cached AJAX + fragment + history + bookmarking = Tasty!';
 
 // ========================================================================== //
-// SUBHEADER
-// ========================================================================== //
-
-ob_start();
-?>
-  <a href="http://benalman.com/projects/jquery-bbq-plugin/">Home, Documentation, Source</a>
-<?
-$shell['h3'] = ob_get_contents();
-ob_end_clean();
-
-// ========================================================================== //
 // SCRIPT
 // ========================================================================== //
 
@@ -41,11 +30,11 @@ $(function(){
   $('.bbq a[href^=#]').live( 'click', function(e){
     var state = {},
       
+      // Get the id of this .bbq widget.
+      id = $(this).closest( '.bbq' ).attr( 'id' ),
+      
       // Get the url from the link's href attribute, stripping any leading #.
       url = $(this).attr( 'href' ).replace( /^#/, '' );
-      
-      // Get the id of this .bbq widget.
-      id = $(this).closest( '.bbq' ).attr( 'id' );
     
     // Set the state!
     state[ id ] = url;
@@ -59,7 +48,7 @@ $(function(){
   // iterates over all .bbq widgets, getting their appropriate url from the
   // current state. If that .bbq widget's url has changed, display either our
   // cached content or fetch new content to be displayed.
-  $(window).bind( 'hashchange', function (e) {
+  $(window).bind( 'hashchange', function(e) {
     
     // Iterate over all .bbq widgets.
     $('.bbq').each(function(){
@@ -187,8 +176,6 @@ lt. brown: #C4884F
   border: 1px solid #913D00;
   float: right;
   margin-left: 10px;
-  width: 200px;
-  height: 150px;
 }
 
 a.bbq-current {
@@ -238,9 +225,7 @@ ob_start();
 </p>
 
 
-<h3>Navigation</h3>
-
-<p>This div.bbq widget has id "bbq1"</p>
+<h3>This div.bbq widget has id "bbq1"</h3>
 
 <div class="bbq" id="bbq1">
   <div class="bbq-nav bbq-nav-top">
@@ -258,7 +243,7 @@ ob_start();
     
     <!-- This content will be shown if no path is specified in the URL fragment. -->
     <div class="bbq-default bbq-item">
-      <img src="bbq.jpg" width="400" height="300">
+      <img src="bbq.jpg" width="200" height="150">
       <h1>jQuery BBQ</h1>
       <p>Click a nav item above to load some delicious AJAX content! Also, once
         the content loads, feel free to further explore our savory delights by
@@ -270,7 +255,7 @@ ob_start();
   <div style="clear:both;"></div>
 </div>
 
-<p>This div.bbq widget has id "bbq2"</p>
+<h3>This div.bbq widget has id "bbq2"</h3>
 
 <div class="bbq" id="bbq2">
   <div class="bbq-nav bbq-nav-top">
@@ -288,7 +273,7 @@ ob_start();
     
     <!-- This content will be shown if no path is specified in the URL fragment. -->
     <div class="bbq-default bbq-item">
-      <img src="bbq.jpg" width="400" height="300">
+      <img src="bbq.jpg" width="200" height="150">
       <h1>jQuery BBQ</h1>
       <p>And there's plenty more where that came from! Don't forget to click
         here for some down-home AJAX content, cooked special, just for this
@@ -302,7 +287,7 @@ ob_start();
 
 <h3>The code</h3>
 
-<p>Note that a lot of the following code is very similar to the <a href="../fragment-basic/">basic window.onhashchange</a> example. That's intentional! They're functionally very similar, but while this version is far more robust, it is somewhat more complex. Look at both to see which meets your needs, and don't be afraid to adapt.</p>
+<p>Note that a lot of the following code is very similar to the <a href="../fragment-basic/">basic window.onhashchange</a> example. That's intentional! They're functionally very similar, but while this version is far more robust, it is somewhat more complex. Look at both to see which meets your needs, and don't be afraid to adapt. Also, if you want to see a robust AND simple implementation, be sure to check out the <a href="../fragment-jquery-ui-tabs/">jQuery UI Tabs</a> example.</p>
 
 <pre class="brush:js">
 <?= htmlspecialchars( $shell['script'] ); ?>

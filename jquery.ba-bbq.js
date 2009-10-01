@@ -11,10 +11,10 @@
 //
 // *Version: 0.1pre, Last updated: 9/30/2009*
 // 
-// Home       - http://benalman.com/projects/jquery-bbq-plugin/
-// GitHub     - http://github.com/cowboy/jquery-bbq/
-// Source     - http://github.com/cowboy/jquery-bbq/raw/master/jquery.ba-bbq.js
-// (Minified) - http://github.com/cowboy/jquery-bbq/raw/master/jquery.ba-bbq.min.js (3.1kb)
+// Project Home - http://benalman.com/projects/jquery-bbq-plugin/
+// GitHub       - http://github.com/cowboy/jquery-bbq/
+// Source       - http://github.com/cowboy/jquery-bbq/raw/master/jquery.ba-bbq.js
+// (Minified)   - http://github.com/cowboy/jquery-bbq/raw/master/jquery.ba-bbq.min.js (3.1kb)
 // 
 // About: License
 // 
@@ -29,7 +29,7 @@
 // 
 // Basic AJAX     - http://benalman.com/code/projects/jquery-bbq/examples/fragment-basic/
 // Advanced AJAX  - http://benalman.com/code/projects/jquery-bbq/examples/fragment-advanced/
-// jQuery UI Tabs - COMING SOON
+// jQuery UI Tabs - http://benalman.com/code/projects/jquery-bbq/examples/fragment-jquery-ui-tabs/
 // Deparam        - COMING SOON
 // 
 // About: Support and Testing

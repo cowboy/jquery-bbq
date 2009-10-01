@@ -7,17 +7,6 @@ $shell['title2'] = "window.onhashchange » Basic";
 $shell['h2'] = 'Cached AJAX + fragment + history + bookmarking = Tasty!';
 
 // ========================================================================== //
-// SUBHEADER
-// ========================================================================== //
-
-ob_start();
-?>
-  <a href="http://benalman.com/projects/jquery-bbq-plugin/">Home, Documentation, Source</a>
-<?
-$shell['h3'] = ob_get_contents();
-ob_end_clean();
-
-// ========================================================================== //
 // SCRIPT
 // ========================================================================== //
 
@@ -34,7 +23,7 @@ $(function(){
   // Bind an event to window.onhashchange that, when the history state changes,
   // gets the url from the hash and displays either our cached content or fetches
   // new content to be displayed.
-  $(window).bind( 'hashchange', function (e) {
+  $(window).bind( 'hashchange', function(e) {
     
     // Get the hash (fragment) as a string, with any leading # removed. Note that
     // in jQuery 1.4, you should use e.fragment instead of $.param.fragment().
@@ -240,7 +229,7 @@ ob_start();
 
 <h3>The code</h3>
 
-<p>Note that a lot of the following code is very similar to the <a href="../fragment-advanced/">advanced window.onhashchange</a> example. That's intentional! They're functionally very similar, but while this version is far less robust, it is much more simple. Look at both to see which meets your needs, and don't be afraid to adapt.</p>
+<p>Note that a lot of the following code is very similar to the <a href="../fragment-advanced/">advanced window.onhashchange</a> example. That's intentional! They're functionally very similar, but while this version is far less robust, it is much more simple. Look at both to see which meets your needs, and don't be afraid to adapt. Also, if you want to see a robust AND simple implementation, be sure to check out the <a href="../fragment-jquery-ui-tabs/">jQuery UI Tabs</a> example.</p>
 
 <pre class="brush:js">
 <?= htmlspecialchars( $shell['script'] ); ?>

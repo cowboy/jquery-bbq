@@ -100,7 +100,8 @@ function draw_shell() {
 if ( count( get_included_files() ) == 2 ) {
   $shell['title2'] = "Examples";
   
-  $shell['h2'] = 'Select an example from the list below:';
+  $shell['h2'] = 'Select an example:';
+  $shell['h3'] = '';
   
   $shell['html_body'] = '';
   

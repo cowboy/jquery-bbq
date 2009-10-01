@@ -21,7 +21,8 @@ These working examples, complete with fully commented code, illustrate a few
 ways in which this plugin can be used.
 
 [http://benalman.com/code/projects/jquery-bbq/examples/fragment-basic/](http://benalman.com/code/projects/jquery-bbq/examples/fragment-basic/)  
-[http://benalman.com/code/projects/jquery-bbq/examples/fragment-advanced/](http://benalman.com/code/projects/jquery-bbq/examples/fragment-advanced/)
+[http://benalman.com/code/projects/jquery-bbq/examples/fragment-advanced/](http://benalman.com/code/projects/jquery-bbq/examples/fragment-advanced/)  
+[http://benalman.com/code/projects/jquery-bbq/examples/fragment-jquery-ui-tabs/](http://benalman.com/code/projects/jquery-bbq/examples/fragment-jquery-ui-tabs/)
 
 
 ## Support and Testing ##
