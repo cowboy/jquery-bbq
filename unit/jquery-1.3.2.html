@@ -861,6 +861,7 @@ test( 'jQuery.bbq.pushState(), jQuery.bbq.getState(), window.onhashchange', func
     
     function(result){
       if ( is_chrome ) {
+        // Read about this issue here: http://benalman.com/news/2009/09/chrome-browser-history-buggine/
         ok( true, 'history is sporadically broken in chrome, this seems to be a chrome bug' );
       } else {
         same( x, ['almost_done', 'omg_ponies', '', '/path/to/file.php'], 'back button and window.bbq.go(-1) should work' );

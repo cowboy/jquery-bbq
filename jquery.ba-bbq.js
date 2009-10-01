@@ -1,5 +1,5 @@
 /*!
- * jQuery BBQ: Back Button & Query Library - v0.1pre - 9/30/2009
+ * jQuery BBQ: Back Button & Query Library - v0.1pre - 10/1/2009
  * http://benalman.com/projects/jquery-bbq-plugin/
  * 
  * Copyright (c) 2009 "Cowboy" Ben Alman
@@ -9,7 +9,7 @@
 
 // Script: jQuery BBQ: Back Button & Query Library
 //
-// *Version: 0.1pre, Last updated: 9/30/2009*
+// *Version: 0.1pre, Last updated: 10/1/2009*
 // 
 // Project Home - http://benalman.com/projects/jquery-bbq-plugin/
 // GitHub       - http://github.com/cowboy/jquery-bbq/
@@ -30,7 +30,7 @@
 // Basic AJAX     - http://benalman.com/code/projects/jquery-bbq/examples/fragment-basic/
 // Advanced AJAX  - http://benalman.com/code/projects/jquery-bbq/examples/fragment-advanced/
 // jQuery UI Tabs - http://benalman.com/code/projects/jquery-bbq/examples/fragment-jquery-ui-tabs/
-// Deparam        - COMING SOON
+// Deparam        - http://benalman.com/code/projects/jquery-bbq/examples/deparam/
 // 
 // About: Support and Testing
 // 
@@ -44,7 +44,7 @@
 // 
 // About: Release History
 // 
-// 0.1pre - (9/30/2009) Pre-initial release
+// 0.1pre - (10/1/2009) Pre-initial release
 
 (function($,window){
   '$:nomunge'; // Used by YUI compressor.
@@ -113,7 +113,8 @@
   // 
   // Arguments:
   // 
-  //  url - (String) A URL containing query string params to be parsed.
+  //  url - (String) A URL containing query string params to be parsed. If url
+  //    is not passed, the current document.location is used.
   // 
   // Returns:
   // 
@@ -161,7 +162,8 @@
   // 
   // Arguments:
   // 
-  //  url - (String) A URL containing fragment (hash) params to be parsed.
+  //  url - (String) A URL containing fragment (hash) params to be parsed. If
+  //    url is not passed, the current document.location is used.
   // 
   // Returns:
   // 
@@ -283,7 +285,7 @@
   // 
   //  params - (String) A params string to be parsed.
   //  coerce - (Boolean) If true, coerces any numbers or true, false, null, and
-  //    undefined to their actual value. Defaults to false.
+  //    undefined to their actual value. Defaults to false if omitted.
   // 
   // Returns:
   // 
@@ -393,10 +395,11 @@
   // 
   // Arguments:
   // 
-  //  url - (String) A params string or URL containing query string params to be
-  //    parsed.
+  //  url - (String) An optional params string or URL containing query string
+  //    params to be parsed. If url is omitted, the current document.location
+  //    is used.
   //  coerce - (Boolean) If true, coerces any numbers or true, false, null, and
-  //    undefined to their actual value. Defaults to false.
+  //    undefined to their actual value. Defaults to false if omitted.
   // 
   // Returns:
   // 
@@ -414,10 +417,11 @@
   // 
   // Arguments:
   // 
-  //  url - (String) A params string or URL containing fragment (hash) params to
-  //    be parsed.
+  //  url - (String) An optional params string or URL containing fragment (hash)
+  //    params to be parsed. If url is omitted, the current document.location
+  //    is used.
   //  coerce - (Boolean) If true, coerces any numbers or true, false, null, and
-  //    undefined to their actual value. Defaults to false.
+  //    undefined to their actual value. Defaults to false if omitted.
   // 
   // Returns:
   // 
