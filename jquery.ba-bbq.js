@@ -1,5 +1,5 @@
 /*!
- * jQuery BBQ: Back Button & Query Library - v0.1pre - 10/1/2009
+ * jQuery BBQ: Back Button & Query Library - v1.0 - 10/2/2009
  * http://benalman.com/projects/jquery-bbq-plugin/
  * 
  * Copyright (c) 2009 "Cowboy" Ben Alman
@@ -9,7 +9,7 @@
 
 // Script: jQuery BBQ: Back Button & Query Library
 //
-// *Version: 0.1pre, Last updated: 10/1/2009*
+// *Version: 1.0, Last updated: 10/2/2009*
 // 
 // Project Home - http://benalman.com/projects/jquery-bbq-plugin/
 // GitHub       - http://github.com/cowboy/jquery-bbq/
@@ -39,12 +39,12 @@
 // reside (so you can test it yourself).
 // 
 // jQuery Versions - 1.3.2, 1.4pre
-// Browsers Tested - Internet Explorer 6-8, Firefox 2-3.6, Safari 3-4, Chrome, Opera 9.6-10.
+// Browsers Tested - Internet Explorer 6-8, Firefox 2-3.7, Safari 3-4, Chrome, Opera 9.6-10.
 // Unit Tests      - http://benalman.com/code/projects/jquery-bbq/unit/
 // 
 // About: Release History
 // 
-// 0.1pre - (10/1/2009) Pre-initial release
+// 1.0 - (10/2/2009) Initial release
 
 (function($,window){
   '$:nomunge'; // Used by YUI compressor.

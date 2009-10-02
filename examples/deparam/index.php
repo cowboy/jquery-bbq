@@ -2,7 +2,7 @@
 
 include "../index.php";
 
-$shell['title2'] = "jQuery.deparam";
+$shell['title3'] = "jQuery.deparam";
 
 $shell['h2'] = 'The opposite of jQuery.param, pretty much.';
 

@@ -376,6 +376,14 @@ a:hover {
   color: #C4884F;
 }
 
+#page {
+  width: 700px;
+}
+
+#header h1 {
+  white-space: nowrap;
+}
+
 #footer {
   clear: both;
   padding-top: 2em;

@@ -3,6 +3,9 @@
 $shell = array();
 $base = '../';
 
+$shell['title2'] = 'Examples';
+$shell['link2'] = '../';
+
 include 'config.php';
 
 function draw_shell() {
@@ -12,25 +15,20 @@ function draw_shell() {
 <html lang="en">
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
-  <title>Ben Alman &raquo; <?= $shell['title1'] ?><? if ( $shell['title2'] ) { print ' &raquo; ' . $shell['title2']; } ?></title>
+  <title>Ben Alman &raquo; <?= $shell['title1'] ?><? if ( $shell['title2'] ) { print ' &raquo; ' . $shell['title2']; } ?><? if ( $shell['title3'] ) { print ' &raquo; ' . $shell['title3']; } ?></title>
   <script type="text/javascript" src="<?= $base ?>../shared/ba-debug.js"></script>
-<?
-  
+  <?
   if ( $shell['jquery'] ) {
-    ?>  <script type="text/javascript" src="<?= $base ?>../shared/<?= $shell['jquery'] ?>"></script>
-<?
+    ?><script type="text/javascript" src="<?= $base ?>../shared/<?= $shell['jquery'] ?>"></script><?
   }
   
-  ?>  <script type="text/javascript" src="<?= $base ?>../shared/SyntaxHighlighter/scripts/shCore.js"></script>
-<?
+  ?><script type="text/javascript" src="<?= $base ?>../shared/SyntaxHighlighter/scripts/shCore.js"></script><?
   
   if ( $shell['shBrush'] ) {
     foreach ( $shell['shBrush'] as $brush ) {
-      ?>  <script type="text/javascript" src="<?= $base ?>../shared/SyntaxHighlighter/scripts/shBrush<?= $brush ?>.js"></script>
-<?
+      ?><script type="text/javascript" src="<?= $base ?>../shared/SyntaxHighlighter/scripts/shBrush<?= $brush ?>.js"></script><?
     }
   }
-  
   ?>
   <link rel="stylesheet" type="text/css" href="<?= $base ?>../shared/SyntaxHighlighter/styles/shCore.css">
   <link rel="stylesheet" type="text/css" href="<?= $base ?>../shared/SyntaxHighlighter/styles/shThemeDefault.css">
@@ -46,29 +44,26 @@ function draw_shell() {
     <h1>
       <a href="http://benalman.com/" class="title"><b>Ben</b> Alman</a>
       <?
-      
-      if ( $shell['link1'] ) {
-        print ' &raquo; <a href="' . $shell['link1'] . '">' . $shell['title1'] . '</a>';
-      } else {
-        print ' &raquo; ' . $shell['title1'];
+      $i = 1;
+      while ( $shell["title$i"] ) {
+        print ' &raquo; ';
+        if ( $shell["link$i"] ) {
+          print '<a href="' . $shell["link$i"] . '">' . $shell["title$i"] . '</a>';
+        } else {
+          print $shell["title$i"];
+        }
+        $i++;
       }
-      
-      if ( $shell['title2'] ) {
-        print ' &raquo; ' . $shell['title2'];
-      }
-      
       ?>
     </h1>
     <?
-    if ( $shell['h2'] ) {
-      print '<h2>' . $shell['h2'] . '</h2>';
+    $i = 2;
+    while ( $shell["h$i"] ) {
+      print "<h$i>" . $shell["h$i"] . "</h$i>";
+      $i++;
     }
-    if ( $shell['h3'] ) {
-      print '<h3>' . $shell['h3'] . '</h3>';
-    }
-    
-    print $shell['html_header'];
     ?>
+    <?= $shell['html_header'] ?>
   </div>
   <div id="content">
     <?= $shell['html_body'] ?>
@@ -98,7 +93,7 @@ function draw_shell() {
 }
 
 if ( count( get_included_files() ) == 2 ) {
-  $shell['title2'] = "Examples";
+  $shell['link2'] = '';
   
   $shell['h2'] = 'Select an example:';
   $shell['h3'] = '';
