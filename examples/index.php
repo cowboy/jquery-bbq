@@ -104,7 +104,7 @@ if ( count( get_included_files() ) == 2 ) {
   foreach ( $files as $file ) {
     if ( $file != '.' && $file != '..' && file_exists( "$file/index.php" ) ) {
       $file_contents = file_get_contents( "$file/index.php" );
-      $title = preg_replace( '/^.*\$shell\[\'title2\'\]\s*=\s*"(.*)";.*$/s', '$1', $file_contents );
+      $title = preg_replace( '/^.*\$shell\[\'title3\'\]\s*=\s*"(.*)";.*$/s', '$1', $file_contents );
       $title = $title == $file_contents ? $file : stripcslashes( $title );
       $shell['html_body'] .= "<a href=\"$file/\">$title</a><br>";
     }
