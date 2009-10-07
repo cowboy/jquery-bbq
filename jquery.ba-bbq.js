@@ -1,5 +1,5 @@
 /*!
- * jQuery BBQ: Back Button & Query Library - v1.0 - 10/2/2009
+ * jQuery BBQ: Back Button & Query Library - v1.0.1 - 10/7/2009
  * http://benalman.com/projects/jquery-bbq-plugin/
  * 
  * Copyright (c) 2009 "Cowboy" Ben Alman
@@ -9,7 +9,7 @@
 
 // Script: jQuery BBQ: Back Button & Query Library
 //
-// *Version: 1.0, Last updated: 10/2/2009*
+// *Version: 1.0.1, Last updated: 10/7/2009*
 // 
 // Project Home - http://benalman.com/projects/jquery-bbq-plugin/
 // GitHub       - http://github.com/cowboy/jquery-bbq/
@@ -44,7 +44,11 @@
 // 
 // About: Release History
 // 
-// 1.0 - (10/2/2009) Initial release
+// 1.0.1 - (10/7/2009) Fixed an issue in IE 8. Since both "IE7" and "IE8
+//         Compatibility View" modes erroneously report that the browser
+//         supports the native window.onhashchange event, a slightly more
+//         robust test needed to be added.
+// 1.0   - (10/2/2009) Initial release
 
 (function($,window){
   '$:nomunge'; // Used by YUI compressor.
@@ -74,8 +78,12 @@
     str_href = 'href',
     str_src = 'src',
     
-    // Does the browser support window.onhashchange?
-    supports_onhashchange = 'on' + str_hashchange in window,
+    browser = $.browser,
+    is_old_ie = browser.msie && browser.version < 8,
+    
+    // Does the browser support window.onhashchange? Test for IE version, since
+    // IE8 incorrectly reports this when in "IE7" or "IE8 Compatibility View"!
+    supports_onhashchange = 'on' + str_hashchange in window && !is_old_ie,
     
     // Reused RegExp.
     re_trim_querystring = /^.*\?|#.*$/g,
@@ -789,13 +797,11 @@
     
     // Initialize. In IE 6/7, creates a hidden IFRAME for history handling.
     function init(){
-      var browser = $.browser;
-      
       // Most browsers don't need special methods here..
       set_history = get_history = function(val){ return val; };
       
       // But IE6/7 do!
-      if ( browser.msie && browser.version < 8 ) {
+      if ( is_old_ie ) {
         
         // Create hidden IFRAME at the end of the body.
         iframe = $('<iframe/>').hide().appendTo( 'body' )[0].contentWindow;
