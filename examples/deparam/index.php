@@ -20,13 +20,13 @@ $(function(){
   var params = $.deparam.querystring();
   
   debug.log( 'not coerced', params );
-  $('#deparam_string').html( JSON.stringify( params, null, 2 ) );
+  $('#deparam_string').text( JSON.stringify( params, null, 2 ) );
   
   // Values are coerced.
   params = $.deparam.querystring( true );
   
   debug.log( 'coerced', params );
-  $('#deparam_coerced').html( JSON.stringify( params, null, 2 ) );
+  $('#deparam_coerced').text( JSON.stringify( params, null, 2 ) );
   
   // Highlight the current sample query string link
   var qs = $.param.querystring();

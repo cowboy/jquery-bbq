@@ -486,6 +486,7 @@ pre,
   padding: 0 1px !important;
   background: #fee0c5 !important;
   border: 1px solid #C4884F !important;
+  _zoom: 1;
 }
 
 .syntaxhighlighter .toolbar {
