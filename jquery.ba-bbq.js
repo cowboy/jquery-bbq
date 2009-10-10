@@ -1,5 +1,5 @@
 /*!
- * jQuery BBQ: Back Button & Query Library - v1.0.1 - 10/7/2009
+ * jQuery BBQ: Back Button & Query Library - v1.0.2 - 10/10/2009
  * http://benalman.com/projects/jquery-bbq-plugin/
  * 
  * Copyright (c) 2009 "Cowboy" Ben Alman
@@ -9,7 +9,7 @@
 
 // Script: jQuery BBQ: Back Button & Query Library
 //
-// *Version: 1.0.1, Last updated: 10/7/2009*
+// *Version: 1.0.2, Last updated: 10/10/2009*
 // 
 // Project Home - http://benalman.com/projects/jquery-bbq-plugin/
 // GitHub       - http://github.com/cowboy/jquery-bbq/
@@ -44,6 +44,9 @@
 // 
 // About: Release History
 // 
+// 1.0.2 - (10/10/2009) Fixed an issue in IE 6/7 where the hidden IFRAME caused
+//         a "This page contains both secure and nonsecure items." warning when
+//         used on an https:// page.
 // 1.0.1 - (10/7/2009) Fixed an issue in IE 8. Since both "IE7" and "IE8
 //         Compatibility View" modes erroneously report that the browser
 //         supports the native window.onhashchange event, a slightly more
@@ -804,7 +807,7 @@
       if ( is_old_ie ) {
         
         // Create hidden IFRAME at the end of the body.
-        iframe = $('<iframe/>').hide().appendTo( 'body' )[0].contentWindow;
+        iframe = $('<iframe src="javascript:0"/>').hide().appendTo( 'body' )[0].contentWindow;
         
         // Get history by looking at the hidden IFRAME's location.hash.
         get_history = function() {

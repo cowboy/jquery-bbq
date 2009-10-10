@@ -71,8 +71,8 @@ ob_end_clean();
 
 ob_start();
 ?>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.7.2/jquery-ui.js"></script>
-<link rel="stylesheet" href="http://jqueryui.com/themes/base/ui.all.css" type="text/css" media="all" />
+<script type="text/javascript" src="../../shared/jquery-ui-1.7.2/js/jquery-ui-1.7.2.js"></script>
+<link rel="stylesheet" href="../../shared/jquery-ui-1.7.2/css/benalman/jquery-ui-1.7.2.css" type="text/css" media="all" />
 
 <script type="text/javascript" src="../../jquery.ba-bbq.js"></script>
 <script type="text/javascript" language="javascript">
