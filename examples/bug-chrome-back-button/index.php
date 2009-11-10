@@ -2,7 +2,7 @@
 
 include "../index.php";
 
-$shell['title3'] = "Back Button Test";
+$shell['title3'] = "Bug in Chrome: Back Button";
 
 $shell['h2'] = 'Wanna see a strange issue in Chrome?';
 
