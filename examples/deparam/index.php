@@ -112,6 +112,7 @@ ob_end_clean();
 
 ob_start();
 ?>
+<?= $shell['donate'] ?>
 
 <p>
   <a href="http://benalman.com/projects/jquery-bbq-plugin/">jQuery BBQ</a> includes a powerful jQuery.deparam method that is capable of fully deserializing not only any params string that jQuery.param can create, but that PHP and Rails (and hopefully everything else) can create. And even though only the query string is being parsed this example, methods for parsing a params string out of the fragment (hash) as well parsing any stand-alone params string are included. jQuery BBQ can also be used to merge params from multiple URLs or objects into a new URL, even within element attributes. See <a href="../../docs/">the documentation</a> for a full list of methods!

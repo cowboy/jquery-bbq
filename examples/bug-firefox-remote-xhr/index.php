@@ -188,6 +188,7 @@ ob_end_clean();
 
 ob_start();
 ?>
+<?= $shell['donate'] ?>
 
 <p>
   First, open this page in a new window or tab, to clear any current window or tab history. Make your window wide enough so that you can see the full URL in the address bar, with some extra space left over.

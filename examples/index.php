@@ -8,6 +8,22 @@ $shell['link2'] = '../';
 
 include 'config.php';
 
+ob_start();
+?>
+    <div id="donate">
+      <p>Your generous donation allows me to continue developing and updating my code!</p>
+      <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+      <input type="hidden" name="cmd" value="_s-xclick">
+      <input type="hidden" name="hosted_button_id" value="5791421">
+      <input class="submit" type="image" src="../donate.gif" name="submit" alt="PayPal - The safer, easier way to pay online!">
+      <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
+      </form>
+      <div class="clear"></div>
+    </div>
+<?
+$shell['donate'] = ob_get_contents();
+ob_end_clean();
+
 function draw_shell() {
   global $shell, $base;
   
@@ -75,15 +91,6 @@ function draw_shell() {
     <p>
       All original code is Copyright © 2009 "Cowboy" Ben Alman and dual licensed under the MIT and GPL licenses. View the <a href="http://benalman.com/about/license/">license page</a> for more details. 
     </p>
-    <div class="donate">
-      <p>Let me know how much you appreciate my work with a small donation!</p>
-      <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
-      <input type="hidden" name="cmd" value="_s-xclick">
-      <input type="hidden" name="hosted_button_id" value="5791421">
-      <input type="image" src="https://www.paypal.com/en_US/i/btn/btn_donate_SM.gif" name="submit" alt="PayPal - The safer, easier way to pay online!">
-      <img alt="" border="0" src="https://www.paypal.com/en_US/i/scr/pixel.gif" width="1" height="1">
-      </form>
-    </div>
   </div>
 </div>
 
@@ -104,7 +111,7 @@ if ( count( get_included_files() ) == 2 ) {
   foreach ( $files as $file ) {
     if ( $file != '.' && $file != '..' && file_exists( "$file/index.php" ) ) {
       $file_contents = file_get_contents( "$file/index.php" );
-      $title = preg_replace( '/^.*\$shell\[\'title3\'\]\s*=\s*"(.*)";.*$/s', '$1', $file_contents );
+      $title = preg_replace( '/^.*\$shell\[\'title3\'\]\s*=\s*"(.*?)";.*$/s', '$1', $file_contents );
       $title = $title == $file_contents ? $file : stripcslashes( $title );
       $shell['html_body'] .= "<a href=\"$file/\">$title</a><br>";
     }
