@@ -3,7 +3,7 @@
  * http://benalman.com/projects/javascript-debug-console-log/
  * 
  * Copyright (c) 2009 "Cowboy" Ben Alman
- * Licensed under the MIT license
+ * Dual licensed under the MIT and GPL licenses.
  * http://benalman.com/about/license/
  * 
  * With lots of help from Paul Irish!
@@ -24,21 +24,21 @@
 // About: License
 // 
 // Copyright (c) 2009 "Cowboy" Ben Alman,
-// Licensed under the MIT license.
+// Dual licensed under the MIT and GPL licenses.
 // http://benalman.com/about/license/
 // 
 // About: Support and Testing
 // 
 // Information about what browsers this code has been tested in.
 // 
-// Browsers Tested - Internet Explorer 6-8, Firefox 3, Safari 3-4, Chrome, Opera 9.
+// Browsers Tested - Internet Explorer 6-8, Firefox 3-3.5, Safari 3-4, Chrome, Opera 9.
 // 
 // About: Examples
 // 
 // These working examples, complete with fully commented code, illustrate a few
 // ways in which this plugin can be used.
 // 
-// Examples   - http://benalman.com/code/test/js-debug/
+// Examples - http://benalman.com/code/projects/javascript-debug/examples/debug/
 // 
 // About: Revision History
 // 
