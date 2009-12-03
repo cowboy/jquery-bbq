@@ -23,10 +23,10 @@ var old_param = $.fn.jquery < '1.4',
   aps = Array.prototype.slice;
 
 if ( $.param.querystring() !== params_init || $.param.fragment() !== params_init ) {
-  init_url = document.location.href;
+  init_url = window.location.href;
   init_url = $.param.querystring( init_url, params_init, 2 );
   init_url = $.param.fragment( init_url, params_init, 2 );
-  document.location.href = init_url;
+  window.location.href = init_url;
 }
 
 $('#jq_version').html( $.fn.jquery );
@@ -81,10 +81,16 @@ var params_obj = { a:['4','5','6'], b:{x:['7'], y:'8', z:['9','0','true','false'
   params_str_old = 'a=4&a=5&a=6&b=[object+Object]&c=1';
 
 test( 'jQuery.param.querystring', function() {
-  expect( 6 );
+  expect( 11 );
   
-  equals( $.param.querystring(), params_str, 'params string from document.location' );
-  equals( $.param.querystring( params_str ), params_str, 'params string from string' );
+  equals( $.param.querystring( 'http://example.com/' ), '', 'properly identifying params' );
+  equals( $.param.querystring( 'http://example.com/?foo' ),'foo', 'properly identifying params' );
+  equals( $.param.querystring( 'http://example.com/?foo#bar' ),'foo', 'properly identifying params' );
+  equals( $.param.querystring( 'http://example.com/?foo#bar?baz' ),'foo', 'properly identifying params' );
+  equals( $.param.querystring( 'http://example.com/#foo' ),'', 'properly identifying params' );
+  equals( $.param.querystring( 'http://example.com/#foo?bar' ),'', 'properly identifying params' );
+  
+  equals( $.param.querystring(), params_str, 'params string from window.location' );
   equals( $.param.querystring( '?' + params_str ), params_str, 'params string from url' );
   equals( $.param.querystring( 'foo.html?' + params_str ), params_str, 'params string from url' );
   equals( $.param.querystring( 'http://a:b@example.com:1234/foo.html?' + params_str ), params_str, 'params string from url' );
@@ -92,10 +98,16 @@ test( 'jQuery.param.querystring', function() {
 });
 
 test( 'jQuery.param.fragment', function() {
-  expect( 6 );
+  expect( 11 );
   
-  equals( $.param.fragment(), params_str, 'params string from document.location' );
-  equals( $.param.fragment( params_str ), params_str, 'params string from string' );
+  equals( $.param.fragment( 'http://example.com/' ), '', 'properly identifying params' );
+  equals( $.param.fragment( 'http://example.com/?foo' ),'', 'properly identifying params' );
+  equals( $.param.fragment( 'http://example.com/?foo#bar' ),'bar', 'properly identifying params' );
+  equals( $.param.fragment( 'http://example.com/?foo#bar?baz' ),'bar?baz', 'properly identifying params' );
+  equals( $.param.fragment( 'http://example.com/#foo' ),'foo', 'properly identifying params' );
+  equals( $.param.fragment( 'http://example.com/#foo?bar' ),'foo?bar', 'properly identifying params' );
+  
+  equals( $.param.fragment(), params_str, 'params string from window.location' );
   equals( $.param.fragment( '#' + params_str ), params_str, 'params string from url' );
   equals( $.param.fragment( 'foo.html#' + params_str ), params_str, 'params string from url' );
   equals( $.param.fragment( 'http://a:b@example.com:1234/foo.html#' + params_str ), params_str, 'params string from url' );
@@ -326,8 +338,8 @@ test( 'jQuery.deparam - pre-1.4-style params', function() {
 test( 'jQuery.deparam.querystring', function() {
   expect( 12 );
   
-  same( $.deparam.querystring(), params_obj, 'params obj from document.location' );
-  same( $.deparam.querystring( true ), params_obj_coerce, 'params obj from document.location, coerced' );
+  same( $.deparam.querystring(), params_obj, 'params obj from window.location' );
+  same( $.deparam.querystring( true ), params_obj_coerce, 'params obj from window.location, coerced' );
   same( $.deparam.querystring( params_str ), params_obj, 'params obj from string' );
   same( $.deparam.querystring( params_str, true ), params_obj_coerce, 'params obj from string, coerced' );
   same( $.deparam.querystring( '?' + params_str ), params_obj, 'params obj from string' );
@@ -343,8 +355,8 @@ test( 'jQuery.deparam.querystring', function() {
 test( 'jQuery.deparam.fragment', function() {
   expect( 12 );
   
-  same( $.deparam.fragment(), params_obj, 'params obj from document.location' );
-  same( $.deparam.fragment( true ), params_obj_coerce, 'params obj from document.location, coerced' );
+  same( $.deparam.fragment(), params_obj, 'params obj from window.location' );
+  same( $.deparam.fragment( true ), params_obj_coerce, 'params obj from window.location, coerced' );
   same( $.deparam.fragment( params_str ), params_obj, 'params obj from string' );
   same( $.deparam.fragment( params_str, true ), params_obj_coerce, 'params obj from string, coerced' );
   same( $.deparam.fragment( '#' + params_str ), params_obj, 'params obj from string' );
@@ -634,7 +646,7 @@ test( 'jQuery.bbq.pushState(), jQuery.bbq.getState(), window.onhashchange', func
   var a, b, c, d, e, f, x, y, hash, obj, event, msg = 'Testing history';
   
   $.bbq.pushState();
-  equals( document.location.hash.replace( /^#/, ''), '', 'document.location hash should be empty' );
+  equals( window.location.hash.replace( /^#/, ''), '', 'window.location hash should be empty' );
   
   $.bbq.pushState({ a:'1', b:'1' });
   same( $.deparam.fragment(), { a:'1', b:'1' }, 'hash should be set properly' );
@@ -825,7 +837,7 @@ test( 'jQuery.bbq.pushState(), jQuery.bbq.getState(), window.onhashchange', func
       $(window).unbind( 'hashchange' );
     },
     
-    [ '#almost_done', 2 ],
+    [ '#almost_done?not_search', 2 ],
     
     function(result){
       equals( hash, '', 'event handler 1: $.param.fragment()' );
@@ -864,7 +876,7 @@ test( 'jQuery.bbq.pushState(), jQuery.bbq.getState(), window.onhashchange', func
         // Read about this issue here: http://benalman.com/news/2009/09/chrome-browser-history-buggine/
         ok( true, 'history is sporadically broken in chrome, this seems to be a chrome bug' );
       } else {
-        same( x, ['almost_done', 'omg_ponies', '', '/path/to/file.php'], 'back button and window.bbq.go(-1) should work' );
+        same( x, ['almost_done?not_search', 'omg_ponies', '', '/path/to/file.php'], 'back button and window.bbq.go(-1) should work' );
       }
       
       $(window).unbind( 'hashchange' );
@@ -903,7 +915,11 @@ h3 {
 <h2 id="banner"></h2>
 <h2 id="userAgent"></h2>
 
-<h3>These unit tests include jQuery <span id="jq_version">...</span>. To view the unit tests using jQuery 1.3.2, <a href="jquery-1.3.2.html">click here</a></h3>
+<h3>
+  These unit tests include jQuery <span id="jq_version">...</span>. To view the unit tests using
+  jQuery 1.3.2, <a href="./jquery-1.3.2.html">click here</a>
+  <!--jQuery 1.4pre, <a href="./">click here</a>-->
+</h3>
 
 <ol id="tests"></ol>
 <div id="main"></div>

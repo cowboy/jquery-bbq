@@ -31,11 +31,11 @@ function set_title( i ) {
   document.title = document.title.replace( /\s*\d*$/, '' ) + ' ' + i;
 }
 
-// Add new history entries by changing document.location.hash, in an
+// Add new history entries by changing window.location.hash, in an
 // asynchronous loop.
 function add_history_entries( start, end ) {
   (function loopy(){
-    document.location.hash = '#' + start;
+    window.location.hash = '#' + start;
     set_title( start );
     ++start <= end && setTimeout( loopy, delay );
   })();
@@ -51,7 +51,7 @@ function go_back( i ) {
 
 // Some window.onhashchange stuff. Not really important here.
 function handler() {
-  var i = document.location.hash.replace( /^#/, '' );
+  var i = window.location.hash.replace( /^#/, '' );
   set_title( i );
 };
 

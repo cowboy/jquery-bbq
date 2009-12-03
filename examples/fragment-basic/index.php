@@ -185,7 +185,7 @@ ob_start();
 </p>
 
 <p>
-  In this basic example, document.location.hash is used to store a simple string value of the file to be loaded via AJAX, so that not only a history entry is added, but also so that the page, in its current state, can be bookmarked. Because the hash contains only a single filename, this example doesn't support multiple content boxes, each with their own state, on the same page, but that's definitely still possible! Just check out the <a href="../fragment-advanced/">advanced window.onhashchange</a> example.
+  In this basic example, window.location.hash is used to store a simple string value of the file to be loaded via AJAX, so that not only a history entry is added, but also so that the page, in its current state, can be bookmarked. Because the hash contains only a single filename, this example doesn't support multiple content boxes, each with their own state, on the same page, but that's definitely still possible! Just check out the <a href="../fragment-advanced/">advanced window.onhashchange</a> example.
 </p>
 
 <h3>Navigation</h3>

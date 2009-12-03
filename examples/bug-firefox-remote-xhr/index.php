@@ -29,13 +29,13 @@ $(function(){
   // Set the hash the "usual" way.
   function callback_hash( idx ) {
     debug.log( idx );
-    document.location.hash = '#done_' + idx;
+    window.location.hash = '#done_' + idx;
   };
   
   // Set the hash by re-setting the entire URL.
   function callback_href( idx ) {
     debug.log( idx );
-    document.location.href = document.location.href.replace( /#.*$/, '' ) + '#done_' + idx;
+    window.location.href = window.location.href.replace( /#.*$/, '' ) + '#done_' + idx;
   };
   
   // Set the hash by re-setting the entire URL.. asynchronously.
@@ -121,7 +121,7 @@ $(function(){
       .appendTo( '#nav' )
       .find( 'a' )
         .click(function(){
-          document.location.hash = '#start_' + idx;
+          window.location.hash = '#start_' + idx;
           $.ajax( $.extend({}, v[1]) );
           return false;
         });

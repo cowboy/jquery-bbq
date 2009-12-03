@@ -147,7 +147,7 @@ ob_start();
 </p>
 
 <p>
-  Like the <a href="../fragment-advanced/">advanced window.onhashchange</a> example, document.location.hash is used to store a serialized data object representing the state of multiple tab boxes. Due to the flexibility of $.bbq.pushState(), each tab box doesn't need to know the state of any other tab box to push a state change onto the history, only their state needs to be specifed and it will be merged in, creating a new history entry and a page state that is bookmarkable. Of course, if you only want to keep track of a single item on the page, you might want to check out the <a href="../fragment-basic/">basic window.onhashchange</a> example.
+  Like the <a href="../fragment-advanced/">advanced window.onhashchange</a> example, window.location.hash is used to store a serialized data object representing the state of multiple tab boxes. Due to the flexibility of $.bbq.pushState(), each tab box doesn't need to know the state of any other tab box to push a state change onto the history, only their state needs to be specifed and it will be merged in, creating a new history entry and a page state that is bookmarkable. Of course, if you only want to keep track of a single item on the page, you might want to check out the <a href="../fragment-basic/">basic window.onhashchange</a> example.
 </p>
 
 <h3>This jQuery UI Tabs widget has id "some_tabs"</h3>

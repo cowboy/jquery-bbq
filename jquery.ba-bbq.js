@@ -1,5 +1,5 @@
 /*!
- * jQuery BBQ: Back Button & Query Library - v1.0.2 - 10/10/2009
+ * jQuery BBQ: Back Button & Query Library - v1.0.3 - 12/2/2009
  * http://benalman.com/projects/jquery-bbq-plugin/
  * 
  * Copyright (c) 2009 "Cowboy" Ben Alman
@@ -9,12 +9,12 @@
 
 // Script: jQuery BBQ: Back Button & Query Library
 //
-// *Version: 1.0.2, Last updated: 10/10/2009*
+// *Version: 1.0.2pre, Last updated: 12/2/2009*
 // 
 // Project Home - http://benalman.com/projects/jquery-bbq-plugin/
 // GitHub       - http://github.com/cowboy/jquery-bbq/
 // Source       - http://github.com/cowboy/jquery-bbq/raw/master/jquery.ba-bbq.js
-// (Minified)   - http://github.com/cowboy/jquery-bbq/raw/master/jquery.ba-bbq.min.js (3.1kb)
+// (Minified)   - http://github.com/cowboy/jquery-bbq/raw/master/jquery.ba-bbq.min.js (3.2kb)
 // 
 // About: License
 // 
@@ -44,6 +44,11 @@
 // 
 // About: Release History
 // 
+// 1.0.3 - (12/2/2009) Fixed an issue in IE 6 where location.search and
+//         location.hash would report incorrectly if the hash contained the ?
+//         character. Also $.param.querystring and $.param.fragment will no
+//         longer parse params out of a URL that doesn't contain ? or #,
+//         respectively.
 // 1.0.2 - (10/10/2009) Fixed an issue in IE 6/7 where the hidden IFRAME caused
 //         a "This page contains both secure and nonsecure items." warning when
 //         used on an https:// page.
@@ -58,7 +63,7 @@
   
   // Some convenient shortcuts.
   var undefined,
-    loc = document.location,
+    loc = window.location,
     aps = Array.prototype.slice,
     decode = decodeURIComponent,
     
@@ -76,7 +81,6 @@
     str_hashchange = 'hashchange',
     str_querystring = 'querystring',
     str_fragment = 'fragment',
-    str_hash = 'hash',
     str_elemUrlAttr = 'elemUrlAttr',
     str_href = 'href',
     str_src = 'src',
@@ -111,12 +115,24 @@
     };
   };
   
+  // Get location.hash (or what you'd expect location.hash to be) sans any
+  // leading #. Thanks for making this necessary, Firefox!
+  function get_fragment( url ) {
+    return url.replace( /^[^#]*#?(.*)$/, '$1' );
+  };
+  
+  // Get location.search (or what you'd expect location.search to be) sans any
+  // leading #. Thanks for making this necessary, IE6!
+  function get_querystring( url ) {
+    return url.replace( /(?:^[^?#]*\?([^#]*).*$)?.*/, '$1' );
+  };
+  
   // Section: Param (to string)
   // 
   // Method: jQuery.param.querystring
   // 
   // Retrieve the query string from a URL or if no arguments are passed, the
-  // current document.location.
+  // current window.location.
   // 
   // Usage:
   // 
@@ -125,7 +141,7 @@
   // Arguments:
   // 
   //  url - (String) A URL containing query string params to be parsed. If url
-  //    is not passed, the current document.location is used.
+  //    is not passed, the current window.location is used.
   // 
   // Returns:
   // 
@@ -165,7 +181,7 @@
   // Method: jQuery.param.fragment
   // 
   // Retrieve the fragment (hash) from a URL or if no arguments are passed, the
-  // current document.location.
+  // current window.location.
   // 
   // Usage:
   // 
@@ -174,7 +190,7 @@
   // Arguments:
   // 
   //  url - (String) A URL containing fragment (hash) params to be parsed. If
-  //    url is not passed, the current document.location is used.
+  //    url is not passed, the current window.location is used.
   // 
   // Returns:
   // 
@@ -211,7 +227,7 @@
   //  (String) Either a params string with urlencoded data or a URL with a
   //    urlencoded fragment (hash) in the format 'a=b&c=d&e=f'.
   
-  function jq_param_sub( is_fragment, re, url, params, merge_mode ) {
+  function jq_param_sub( is_fragment, get_func, url, params, merge_mode ) {
     var result,
       qs,
       matches,
@@ -232,7 +248,7 @@
       if ( merge_mode === 2 && is_string( params ) ) {
         // If merge_mode is 2 and params is a string, merge the fragment / query
         // string into the URL wholesale, without converting it into an object.
-        qs = params.replace( re, '' );
+        qs = params.replace( is_fragment ? re_trim_fragment : re_trim_querystring, '' );
         
       } else {
         // Convert relevant params in url to object.
@@ -259,26 +275,17 @@
       // is always added.
       result = matches[1] + ( is_fragment ? '#' : qs || !matches[1] ? '?' : '' ) + qs + hash;
       
-    } else if ( url ) {
-      // Parse params from URL string.
-      result = url.replace( re, '' );
-      
     } else {
-      result = is_fragment
-        
-        // Parse hash from location.href, removing leading #. Firefox urldecodes
-        // location.hash by default, which breaks everything.
-        ? loc[ str_hash ] ? loc[ str_href ].replace( re, '' ) : ''
-        
-        // Get location.search and removing any leading ?
-        : loc.search.replace( /^\??/, '' );
+      // If URL was passed in, parse params from URL string, otherwise parse
+      // params from window.location.
+      result = get_func( url !== undefined ? url : loc[ str_href ] );
     }
     
     return result;
   };
   
-  jq_param[ str_querystring ]                  = curry( jq_param_sub, 0, re_trim_querystring );
-  jq_param[ str_fragment ] = jq_param_fragment = curry( jq_param_sub, 1, re_trim_fragment );
+  jq_param[ str_querystring ]                  = curry( jq_param_sub, 0, get_querystring );
+  jq_param[ str_fragment ] = jq_param_fragment = curry( jq_param_sub, 1, get_fragment );
   
   // Section: Deparam (from string)
   // 
@@ -396,7 +403,7 @@
   
   // Method: jQuery.deparam.querystring
   // 
-  // Parse the query string from a URL or the current document.location,
+  // Parse the query string from a URL or the current window.location,
   // deserializing it into an object, optionally coercing numbers, booleans,
   // null and undefined values.
   // 
@@ -407,7 +414,7 @@
   // Arguments:
   // 
   //  url - (String) An optional params string or URL containing query string
-  //    params to be parsed. If url is omitted, the current document.location
+  //    params to be parsed. If url is omitted, the current window.location
   //    is used.
   //  coerce - (Boolean) If true, coerces any numbers or true, false, null, and
   //    undefined to their actual value. Defaults to false if omitted.
@@ -418,7 +425,7 @@
   
   // Method: jQuery.deparam.fragment
   // 
-  // Parse the fragment (hash) from a URL or the current document.location,
+  // Parse the fragment (hash) from a URL or the current window.location,
   // deserializing it into an object, optionally coercing numbers, booleans,
   // null and undefined values.
   // 
@@ -429,7 +436,7 @@
   // Arguments:
   // 
   //  url - (String) An optional params string or URL containing fragment (hash)
-  //    params to be parsed. If url is omitted, the current document.location
+  //    params to be parsed. If url is omitted, the current window.location
   //    is used.
   //  coerce - (Boolean) If true, coerces any numbers or true, false, null, and
   //    undefined to their actual value. Defaults to false if omitted.
@@ -438,22 +445,22 @@
   // 
   //  (Object) An object representing the deserialized params string.
   
-  function jq_deparam_sub( mode, re, url_or_params, coerce ) {
+  function jq_deparam_sub( is_fragment, url_or_params, coerce ) {
     if ( url_or_params === undefined || typeof url_or_params === 'boolean' ) {
       // url_or_params not specified.
       coerce = url_or_params;
-      url_or_params = jq_param[ mode ]();
+      url_or_params = jq_param[ is_fragment ? str_fragment : str_querystring ]();
     } else {
       url_or_params = is_string( url_or_params )
-        ? url_or_params.replace( re, '' )
+        ? url_or_params.replace( is_fragment ? re_trim_fragment : re_trim_querystring, '' )
         : url_or_params;
     }
     
     return jq_deparam( url_or_params, coerce );
   };
   
-  jq_deparam[ str_querystring ]                    = curry( jq_deparam_sub, str_querystring, re_trim_querystring );
-  jq_deparam[ str_fragment ] = jq_deparam_fragment = curry( jq_deparam_sub, str_fragment, re_trim_fragment );
+  jq_deparam[ str_querystring ]                    = curry( jq_deparam_sub, 0 );
+  jq_deparam[ str_fragment ] = jq_deparam_fragment = curry( jq_deparam_sub, 1 );
   
   // Section: Element manipulation
   // 
@@ -643,15 +650,15 @@
   jq_bbq.pushState = jq_bbq_pushState = function( params, merge_mode ) {
     if ( is_string( params ) && /^#/.test( params ) && merge_mode === undefined ) {
       // Params string begins with # and merge_mode not specified, so completely
-      // overwrite document.location.hash.
+      // overwrite window.location.hash.
       merge_mode = 2;
     }
     
     var has_args = params !== undefined,
-      // Merge params into document.location using $.param.fragment.
+      // Merge params into window.location using $.param.fragment.
       url = jq_param_fragment( loc[ str_href ], has_args ? params : {}, has_args ? merge_mode : 2 );
     
-    // Set new document.location.href. If hash is empty, use just # to prevent
+    // Set new window.location.href. If hash is empty, use just # to prevent
     // browser from reloading the page. Note that Safari 3 & Chrome barf on
     // location.hash = '#'.
     loc[ str_href ] = url + ( /#/.test( url ) ? '' : '#' );
@@ -695,7 +702,7 @@
   
   // Event: window.onhashchange
   // 
-  // Fired when document.location.hash changes. In browsers that support it, the
+  // Fired when window.location.hash changes. In browsers that support it, the
   // native window.onhashchange event is used (IE8, FF3.6), otherwise a polling
   // loop is initialized, running every <jQuery.bbq.pollDelay> milliseconds to
   // see if the hash has changed. In IE 6 and 7, a hidden IFRAME is created
@@ -710,8 +717,8 @@
   // e.fragment is equivalent to the output of <jQuery.param.fragment>, and
   // e.getState() is equivalent to <jQuery.bbq.getState>, except that they refer
   // to the event-specific state value stored in the event object, instead of
-  // the current document.location, allowing the event object to be referenced
-  // later, even if document.location has changed.
+  // the current window.location, allowing the event object to be referenced
+  // later, even if window.location has changed.
   // 
   // > $(window).bind( 'hashchange', function(e) {
   // >   var hash_str = e.fragment,
@@ -811,7 +818,7 @@
         
         // Get history by looking at the hidden IFRAME's location.hash.
         get_history = function() {
-          return iframe.document.location[ str_hash ].replace( /^#/, '' );
+          return get_fragment( iframe.document.location[ str_href ] );
         };
         
         // Set a new history item by opening and then closing the IFRAME
@@ -819,9 +826,8 @@
         set_history = function( hash, history_hash ) {
           if ( hash !== history_hash ) {
             var doc = iframe.document;
-            doc.open();
-            doc.close();
-            doc.location[ str_hash ] = '#' + hash;
+            doc.open().close();
+            doc.location.hash = '#' + hash;
           }
         };
         

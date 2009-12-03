@@ -222,7 +222,7 @@ ob_start();
 </p>
 
 <p>
-  In this example, document.location.hash is used to store a serialized data object representing the state of multiple "widgets". Due to the flexibility of $.bbq.pushState(), a widget doesn't need to know the state of any other widget to push a state change onto the history, only their state needs to be specifed and it will be merged in, creating a new history entry and a page state that is bookmarkable. Of course, if you only want to keep track of a single item on the page, you might want to check out the <a href="../fragment-basic/">basic window.onhashchange</a> example.
+  In this example, window.location.hash is used to store a serialized data object representing the state of multiple "widgets". Due to the flexibility of $.bbq.pushState(), a widget doesn't need to know the state of any other widget to push a state change onto the history, only their state needs to be specifed and it will be merged in, creating a new history entry and a page state that is bookmarkable. Of course, if you only want to keep track of a single item on the page, you might want to check out the <a href="../fragment-basic/">basic window.onhashchange</a> example.
 </p>
 
 
