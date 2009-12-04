@@ -11,9 +11,9 @@ $shell['h2'] = 'Wanna see a strange issue in Firefox?';
 // ========================================================================== //
 
 ob_start();
-?><!--
-  <a href="http://benalman.com/news/2009/09/chrome-browser-history-buggine/">Read more about the issue here!</a>
---><?
+?>
+  <a href="http://benalman.com/news/2009/11/is-this-a-firefox-remote-xhr-bug/">Read more about the issue here!</a>
+<?
 $shell['h3'] = ob_get_contents();
 ob_end_clean();
 
