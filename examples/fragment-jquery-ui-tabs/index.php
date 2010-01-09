@@ -2,7 +2,7 @@
 
 include "../index.php";
 
-$shell['title3'] = "window.onhashchange » jQuery UI Tabs";
+$shell['title3'] = "hashchange » jQuery UI Tabs";
 
 $shell['h2'] = 'Multiple jQuery UI Tabs + fragment + history + bookmarking = Tasty!';
 

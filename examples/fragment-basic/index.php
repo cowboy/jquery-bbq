@@ -2,7 +2,7 @@
 
 include "../index.php";
 
-$shell['title3'] = "window.onhashchange » Basic";
+$shell['title3'] = "hashchange » Basic";
 
 $shell['h2'] = 'Cached AJAX + fragment + history + bookmarking = Tasty!';
 

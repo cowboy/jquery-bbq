@@ -89,7 +89,7 @@ function draw_shell() {
       If console output is mentioned, but your browser has no console, this example is using <a href="http://benalman.com/projects/javascript-debug-console-log/">JavaScript Debug</a>. Click this bookmarklet: <a href="javascript:if(!window.firebug){window.firebug=document.createElement(&quot;script&quot;);firebug.setAttribute(&quot;src&quot;,&quot;http://getfirebug.com/releases/lite/1.2/firebug-lite-compressed.js&quot;);document.body.appendChild(firebug);(function(){if(window.firebug.version){firebug.init()}else{setTimeout(arguments.callee)}})();void (firebug);if(window.debug&&debug.setCallback){(function(){if(window.firebug&&window.firebug.version){debug.setCallback(function(b){var a=Array.prototype.slice.call(arguments,1);firebug.d.console.cmd[b].apply(window,a)},true)}else{setTimeout(arguments.callee,100)}})()}};">Debug + Firebug Lite</a> to add the Firebug lite console to the current page. Syntax highlighting is handled by <a href="http://alexgorbatchev.com/">SyntaxHighlighter</a>.
     </p>
     <p>
-      All original code is Copyright © 2009 "Cowboy" Ben Alman and dual licensed under the MIT and GPL licenses. View the <a href="http://benalman.com/about/license/">license page</a> for more details. 
+      All original code is Copyright &copy; 2010 "Cowboy" Ben Alman and dual licensed under the MIT and GPL licenses. View the <a href="http://benalman.com/about/license/">license page</a> for more details. 
     </p>
   </div>
 </div>
