@@ -24,7 +24,7 @@ $(function(){
   // that the tabs aren't changed on click, and any custom event name can be
   // specified. Note that if you define a callback for the 'select' event, it
   // will be executed for the selected tab whenever the hash changes.
-  tabs.tabs({ event: 'change', select: function(){ debug.log(this); } });
+  tabs.tabs({ event: 'change' });
   
   // Define our own click handler for the tabs, overriding the default.
   tabs.find( tab_a_selector ).click(function(){
