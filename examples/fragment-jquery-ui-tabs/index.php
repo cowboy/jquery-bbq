@@ -6,6 +6,8 @@ $shell['title3'] = "hashchange » jQuery UI Tabs";
 
 $shell['h2'] = 'Multiple jQuery UI Tabs + fragment + history + bookmarking = Tasty!';
 
+$shell['jquery'] = 'jquery-1.3.2.js';
+
 // ========================================================================== //
 // SCRIPT
 // ========================================================================== //
