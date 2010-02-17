@@ -804,33 +804,39 @@
   
   // Event: hashchange event (BBQ)
   // 
-  // Usage in 1.4 and newer:
+  // Usage in jQuery 1.4 and newer:
   // 
-  // In 1.4 and newer, the event object that is passed into the callback is
-  // augmented with an additional e.fragment property that contains the current
-  // document location.hash state as a string, as well as an e.getState method.
+  // In jQuery 1.4 and newer, the event object passed into any hashchange event
+  // callback is augmented with a copy of the location.hash fragment at the time
+  // the event was triggered as its event.fragment property. In addition, the
+  // event.getState method operates on this property (instead of location.hash)
+  // which allows this fragment-as-a-state to be referenced later, even after
+  // window.location may have changed.
   // 
-  // e.fragment is equivalent to the output of <jQuery.param.fragment>, and
-  // e.getState() is equivalent to <jQuery.bbq.getState>, except that they refer
-  // to the event-specific state value stored in the event object, instead of
-  // the current window.location, allowing the event object to be referenced
-  // later, even if window.location has changed.
+  // Note that event.fragment and event.getState are not defined according to
+  // W3C (or any other) specification, but will still be available whether or
+  // not the hashchange event exists natively in the browser, because of the
+  // utility they provide.
   // 
-  // > $(window).bind( 'hashchange', function(e) {
-  // >   var hash_str = e.fragment,
-  // >     param_obj = e.getState(),
-  // >     param_val = e.getState( 'param_name' ),
-  // >     param_val_coerced = e.getState( 'param_name', true );
+  // The event.fragment property contains the output of <jQuery.param.fragment>
+  // and the event.getState method is equivalent to the <jQuery.bbq.getState>
+  // method.
+  // 
+  // > $(window).bind( 'hashchange', function( event ) {
+  // >   var hash_str = event.fragment,
+  // >     param_obj = event.getState(),
+  // >     param_val = event.getState( 'param_name' ),
+  // >     param_val_coerced = event.getState( 'param_name', true );
   // >   ...
   // > });
   // 
-  // Usage in 1.3.2:
+  // Usage in jQuery 1.3.2:
   // 
-  // In 1.3.2, the event object is unable to be augmented as in 1.4+, so the
-  // fragment state isn't bound to the event object and must instead be parsed
-  // using the <jQuery.param.fragment> and <jQuery.bbq.getState> methods.
+  // In jQuery 1.3.2, the event object cannot to be augmented as in jQuery 1.4+,
+  // so the fragment state isn't bound to the event object and must instead be
+  // parsed using the <jQuery.param.fragment> and <jQuery.bbq.getState> methods.
   // 
-  // > $(window).bind( 'hashchange', function(e) {
+  // > $(window).bind( 'hashchange', function( event ) {
   // >   var hash_str = $.param.fragment(),
   // >     param_obj = $.bbq.getState(),
   // >     param_val = $.bbq.getState( 'param_name' ),
