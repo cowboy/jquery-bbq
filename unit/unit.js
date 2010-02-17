@@ -4,7 +4,7 @@ QUnit.jsDump.HTML = false;
 $(function(){ // START CLOSURE
 
 
-var old_param = $.fn.jquery < '1.4',
+var old_jquery = $.fn.jquery < '1.4',
   is_chrome = /chrome/i.test( navigator.userAgent ),
   params_init = 'a[]=4&a[]=5&a[]=6&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=&c=1',
   init_url
@@ -90,7 +90,7 @@ test( 'jQuery.param.querystring', function() {
 });
 
 test( 'jQuery.param.fragment', function() {
-  expect( 11 );
+  expect( 12 );
   
   equals( $.param.fragment( 'http://example.com/' ), '', 'properly identifying params' );
   equals( $.param.fragment( 'http://example.com/?foo' ),'', 'properly identifying params' );
@@ -104,6 +104,8 @@ test( 'jQuery.param.fragment', function() {
   equals( $.param.fragment( 'foo.html#' + params_str ), params_str, 'params string from url' );
   equals( $.param.fragment( 'http://a:b@example.com:1234/foo.html#' + params_str ), params_str, 'params string from url' );
   equals( $.param.fragment( 'http://a:b@example.com:1234/foo.html?bippity-boppity-boo#' + params_str ), params_str, 'params string from url' );
+  
+  equals( $.param.fragment( '#', { foo: '/a,b@c$d+e&f=g h' } ), '#foo=/a,b%40c%24d%2Be%26f%3Dg+h', '/, should be unescaped, everything else but space (+) should be urlencoded' );
 });
 
 test( 'jQuery.param.querystring - build URL', function() {
@@ -147,7 +149,7 @@ test( 'jQuery.param.querystring - build URL', function() {
     [ { a:[4,5,6], b:{x:[7], y:8, z:[9,0,'true','false','undefined','']} }, 2 ],
     
     function(result){
-      var params = old_param
+      var params = old_jquery
         ? 'a=4&a=5&a=6&b=[object+Object]'
         : 'a[]=4&a[]=5&a[]=6&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=';
       
@@ -157,7 +159,7 @@ test( 'jQuery.param.querystring - build URL', function() {
     [ { a:'1', c:'2' }, 1 ],
     
     function(result){
-      var params = old_param
+      var params = old_jquery
         ? 'a=4&a=5&a=6&c=2&b=[object+Object]'
         : 'a[]=4&a[]=5&a[]=6&c=2&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=';
       
@@ -167,7 +169,7 @@ test( 'jQuery.param.querystring - build URL', function() {
     [ 'foo=1' ],
     
     function(result){
-      var params = old_param
+      var params = old_jquery
         ? 'a=4&a=5&a=6&c=2&b=[object+Object]&foo=1'
         : 'a[]=4&a[]=5&a[]=6&c=2&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=&foo=1';
       
@@ -177,7 +179,7 @@ test( 'jQuery.param.querystring - build URL', function() {
     [ 'foo=2&bar=3', 1 ],
     
     function(result){
-      var params = old_param
+      var params = old_jquery
         ? 'foo=1&bar=3&a=4&a=5&a=6&c=2&b=[object+Object]'
         : 'foo=1&bar=3&a[]=4&a[]=5&a[]=6&c=2&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=';
       
@@ -246,7 +248,7 @@ test( 'jQuery.param.fragment - build URL', function() {
     [ { a:[4,5,6], b:{x:[7], y:8, z:[9,0,'true','false','undefined','']} }, 2 ],
     
     function(result){
-      var params = old_param
+      var params = old_jquery
         ? 'a=4&a=5&a=6&b=[object+Object]'
         : 'a[]=4&a[]=5&a[]=6&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=';
       
@@ -256,7 +258,7 @@ test( 'jQuery.param.fragment - build URL', function() {
     [ { a:'1', c:'2' }, 1 ],
     
     function(result){
-      var params = old_param
+      var params = old_jquery
         ? 'a=4&a=5&a=6&c=2&b=[object+Object]'
         : 'a[]=4&a[]=5&a[]=6&c=2&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=';
       
@@ -266,7 +268,7 @@ test( 'jQuery.param.fragment - build URL', function() {
     [ 'foo=1' ],
     
     function(result){
-      var params = old_param
+      var params = old_jquery
         ? 'a=4&a=5&a=6&c=2&b=[object+Object]&foo=1'
         : 'a[]=4&a[]=5&a[]=6&c=2&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=&foo=1';
       
@@ -276,7 +278,7 @@ test( 'jQuery.param.fragment - build URL', function() {
     [ 'foo=2&bar=3', 1 ],
     
     function(result){
-      var params = old_param
+      var params = old_jquery
         ? 'foo=1&bar=3&a=4&a=5&a=6&c=2&b=[object+Object]'
         : 'foo=1&bar=3&a[]=4&a[]=5&a[]=6&c=2&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=';
       
@@ -452,7 +454,7 @@ test( 'jQuery.fn.querystring', function() {
     [ { a:[4,5,6], b:{x:[7], y:8, z:[9,0,'true','false','undefined','']} }, 2 ],
     
     function(result){
-      var params = old_param
+      var params = old_jquery
         ? 'a=4&a=5&a=6&b=[object+Object]'
         : 'a[]=4&a[]=5&a[]=6&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=';
       
@@ -462,7 +464,7 @@ test( 'jQuery.fn.querystring', function() {
     [ { a:'1', c:'2' }, 1 ],
     
     function(result){
-      var params = old_param
+      var params = old_jquery
         ? 'a=4&a=5&a=6&c=2&b=[object+Object]'
         : 'a[]=4&a[]=5&a[]=6&c=2&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=';
       
@@ -472,7 +474,7 @@ test( 'jQuery.fn.querystring', function() {
     [ 'foo=1' ],
     
     function(result){
-      var params = old_param
+      var params = old_jquery
         ? 'a=4&a=5&a=6&c=2&b=[object+Object]&foo=1'
         : 'a[]=4&a[]=5&a[]=6&c=2&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=&foo=1';
       
@@ -482,7 +484,7 @@ test( 'jQuery.fn.querystring', function() {
     [ 'foo=2&bar=3', 1 ],
     
     function(result){
-      var params = old_param
+      var params = old_jquery
         ? 'foo=1&bar=3&a=4&a=5&a=6&c=2&b=[object+Object]'
         : 'foo=1&bar=3&a[]=4&a[]=5&a[]=6&c=2&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=';
       
@@ -568,7 +570,7 @@ test( 'jQuery.fn.fragment', function() {
     [ { a:[4,5,6], b:{x:[7], y:8, z:[9,0,'true','false','undefined','']} }, 2 ],
     
     function(result){
-      var params = old_param
+      var params = old_jquery
         ? 'a=4&a=5&a=6&b=[object+Object]'
         : 'a[]=4&a[]=5&a[]=6&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=';
       
@@ -578,7 +580,7 @@ test( 'jQuery.fn.fragment', function() {
     [ { a:'1', c:'2' }, 1 ],
     
     function(result){
-      var params = old_param
+      var params = old_jquery
         ? 'a=4&a=5&a=6&c=2&b=[object+Object]'
         : 'a[]=4&a[]=5&a[]=6&c=2&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=';
       
@@ -588,7 +590,7 @@ test( 'jQuery.fn.fragment', function() {
     [ 'foo=1' ],
     
     function(result){
-      var params = old_param
+      var params = old_jquery
         ? 'a=4&a=5&a=6&c=2&b=[object+Object]&foo=1'
         : 'a[]=4&a[]=5&a[]=6&c=2&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=&foo=1';
       
@@ -598,7 +600,7 @@ test( 'jQuery.fn.fragment', function() {
     [ 'foo=2&bar=3', 1 ],
     
     function(result){
-      var params = old_param
+      var params = old_jquery
         ? 'foo=1&bar=3&a=4&a=5&a=6&c=2&b=[object+Object]'
         : 'foo=1&bar=3&a[]=4&a[]=5&a[]=6&c=2&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=';
       
@@ -633,7 +635,7 @@ test( 'jQuery.fn.fragment', function() {
 module( 'jQuery.bbq' );
 
 test( 'jQuery.bbq.pushState(), jQuery.bbq.getState(), jQuery.bbq.removeState(), window.onhashchange', function() {
-  expect( old_param ? 85 : 157 );
+  expect( old_jquery ? 85 : 157 );
   
   var a, b, c, d, e, f, x, y, hash, obj, event, msg = 'Testing window.onhashchange and history';
   
@@ -665,7 +667,7 @@ test( 'jQuery.bbq.pushState(), jQuery.bbq.getState(), jQuery.bbq.removeState(), 
   equals( a.str, '1', 'hashchange triggered manually: $.bbq.getState( "a" )' );
   equals( a.coerce, 1, 'hashchange triggered manually: $.bbq.getState( "a", true )' );
   
-  if ( !old_param ) {
+  if ( !old_jquery ) {
     same( event.getState(), { a:'1', b:'1' }, 'hashchange triggered manually: event.getState()' );
     same( event.getState(true), { a:1, b:1 },  'hashchange triggered manually: event.getState( true )' );
     equals( event.getState('a'), '1', 'hashchange triggered manually: event.getState( "a" )' );
@@ -696,7 +698,7 @@ test( 'jQuery.bbq.pushState(), jQuery.bbq.getState(), jQuery.bbq.removeState(), 
       same( obj.coerce, { a:2, b:1 },  '$.bbq.getState( true )' );
       equals( a.str, '2', '$.bbq.getState( "a" )' );
       equals( a.coerce, 2, '$.bbq.getState( "a", true )' );
-      if ( !old_param ) {
+      if ( !old_jquery ) {
         same( event.getState(), { a:'2', b:'1' }, 'event.getState()' );
         same( event.getState(true), { a:2, b:1 },  'event.getState( true )' );
         equals( event.getState('a'), '2', 'event.getState( "a" )' );
@@ -711,7 +713,7 @@ test( 'jQuery.bbq.pushState(), jQuery.bbq.getState(), jQuery.bbq.removeState(), 
       same( obj.coerce, { a:2, b:2 },  '$.bbq.getState( true )' );
       equals( b.str, '2', '$.bbq.getState( "b" )' );
       equals( b.coerce, 2, '$.bbq.getState( "b", true )' );
-      if ( !old_param ) {
+      if ( !old_jquery ) {
         same( event.getState(), { a:'2', b:'2' }, 'event.getState()' );
         same( event.getState(true), { a:2, b:2 },  'event.getState( true )' );
         equals( event.getState('b'), '2', 'event.getState( "b" )' );
@@ -732,7 +734,7 @@ test( 'jQuery.bbq.pushState(), jQuery.bbq.getState(), jQuery.bbq.removeState(), 
       equals( e.coerce, undefined, '$.bbq.getState( "e", true )' );
       equals( f.str, '', '$.bbq.getState( "f" )' );
       equals( f.coerce, '', '$.bbq.getState( "f", true )' );
-      if ( !old_param ) {
+      if ( !old_jquery ) {
         same( event.getState(), { a:'2', b:'2', c:'true', d:'false', e:'undefined', f:'' }, 'event.getState()' );
         same( event.getState(true), { a:2, b:2, c:true, d:false, e:undefined, f:'' },  'event.getState( true )' );
         equals( event.getState('c'), 'true', 'event.getState( "c" )' );
@@ -765,7 +767,7 @@ test( 'jQuery.bbq.pushState(), jQuery.bbq.getState(), jQuery.bbq.removeState(), 
       equals( e.coerce, undefined, '$.bbq.getState( "e", true )' );
       equals( f.str, '', '$.bbq.getState( "f" )' );
       equals( f.coerce, '', '$.bbq.getState( "f", true )' );
-      if ( !old_param ) {
+      if ( !old_jquery ) {
         same( event.getState(), { a:'2', b:'2', d:'false', e:'undefined', f:'' }, 'event.getState()' );
         same( event.getState(true), { a:2, b:2, d:false, e:undefined, f:'' },  'event.getState( true )' );
         equals( event.getState('a'), '2', 'event.getState( "a" )' );
@@ -802,7 +804,7 @@ test( 'jQuery.bbq.pushState(), jQuery.bbq.getState(), jQuery.bbq.removeState(), 
       equals( e.coerce, undefined, '$.bbq.getState( "e", true )' );
       equals( f.str, undefined, '$.bbq.getState( "f" )' );
       equals( f.coerce, undefined, '$.bbq.getState( "f", true )' );
-      if ( !old_param ) {
+      if ( !old_jquery ) {
         same( event.getState(), { a:'2', b:'2' }, 'event.getState()' );
         same( event.getState(true), { a:2, b:2 },  'event.getState( true )' );
         equals( event.getState('a'), '2', 'event.getState( "a" )' );
@@ -839,7 +841,7 @@ test( 'jQuery.bbq.pushState(), jQuery.bbq.getState(), jQuery.bbq.removeState(), 
       equals( e.coerce, undefined, '$.bbq.getState( "e", true )' );
       equals( f.str, undefined, '$.bbq.getState( "f" )' );
       equals( f.coerce, undefined, '$.bbq.getState( "f", true )' );
-      if ( !old_param ) {
+      if ( !old_jquery ) {
         same( event.getState(), {}, 'event.getState()' );
         same( event.getState(true), {},  'event.getState( true )' );
         equals( event.getState('a'), undefined, 'event.getState( "a" )' );
@@ -862,10 +864,10 @@ test( 'jQuery.bbq.pushState(), jQuery.bbq.getState(), jQuery.bbq.removeState(), 
     [ { a:[4,5,6], b:{x:[7], y:8, z:[9,0,'true','false','undefined','']} }, 2 ],
     
     function(result){
-      var b_str = old_param
+      var b_str = old_jquery
           ? '[object Object]'
           : {x:['7'], y:'8', z:['9','0','true','false','undefined','']},
-        b_coerce = old_param
+        b_coerce = old_jquery
           ? '[object Object]'
           : {x:[7], y:8, z:[9,0,true,false,undefined,'']};
       
@@ -873,7 +875,7 @@ test( 'jQuery.bbq.pushState(), jQuery.bbq.getState(), jQuery.bbq.removeState(), 
       same( obj.coerce, { a:[4,5,6], b:b_coerce },  '$.bbq.getState( true )' );
       same( a.str, ['4','5','6'], '$.bbq.getState( "a" )' );
       same( a.coerce, [4,5,6], '$.bbq.getState( "a", true )' );
-      if ( !old_param ) {
+      if ( !old_jquery ) {
         same( event.getState(), { a:['4','5','6'], b:b_str }, 'event.getState()' );
         same( event.getState(true), { a:[4,5,6], b:b_coerce },  'event.getState( true )' );
         same( event.getState('a'), ['4','5','6'], 'event.getState( "a" )' );
@@ -884,16 +886,16 @@ test( 'jQuery.bbq.pushState(), jQuery.bbq.getState(), jQuery.bbq.removeState(), 
     [ { a:'1', c:'2' }, 1 ],
     
     function(result){
-      var b_str = old_param
+      var b_str = old_jquery
           ? '[object Object]'
           : {x:['7'], y:'8', z:['9','0','true','false','undefined','']},
-        b_coerce = old_param
+        b_coerce = old_jquery
           ? '[object Object]'
           : {x:[7], y:8, z:[9,0,true,false,undefined,'']};
       
       same( obj.str, { a:['4','5','6'], b:b_str, c:'2' }, '$.bbq.getState()' );
       same( obj.coerce, { a:[4,5,6], b:b_coerce, c:2 },  '$.bbq.getState( true )' );
-      if ( !old_param ) {
+      if ( !old_jquery ) {
         same( event.getState(), { a:['4','5','6'], b:b_str, c:'2' }, 'event.getState()' );
         same( event.getState(true), { a:[4,5,6], b:b_coerce, c:2 },  'event.getState( true )' );
       }
@@ -903,7 +905,7 @@ test( 'jQuery.bbq.pushState(), jQuery.bbq.getState(), jQuery.bbq.removeState(), 
     
     function(result){
       equals( hash, '/path/to/file.php', '$.param.fragment()' );
-      if ( !old_param ) {
+      if ( !old_jquery ) {
         equals( event.fragment, '/path/to/file.php', 'event.fragment' );
       }
     },
@@ -912,7 +914,7 @@ test( 'jQuery.bbq.pushState(), jQuery.bbq.getState(), jQuery.bbq.removeState(), 
     
     function(result){
       equals( hash, '', '$.param.fragment()' );
-      if ( !old_param ) {
+      if ( !old_jquery ) {
         equals( event.fragment, '', 'event.fragment' );
       }
     },
