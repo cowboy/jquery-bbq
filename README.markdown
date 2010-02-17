@@ -1,7 +1,7 @@
 # jQuery BBQ: Back Button & Query Library #
 [http://benalman.com/projects/jquery-bbq-plugin/](http://benalman.com/projects/jquery-bbq-plugin/)
 
-Version: 1.2, Last updated: 2/16/2010
+Version: 1.2.1, Last updated: 2/17/2010
 
 jQuery BBQ enables simple, yet powerful bookmarkable #hash history via a cross-browser window.onhashchange event. In addition, jQuery BBQ provides a full jQuery.deparam() method, along with both fragment and query string parse and merge utility methods.
 
@@ -54,6 +54,7 @@ Safari: Back Button from a different domain
 
 ## Release History ##
 
+1.2.1 - (2/17/2009) Actually fixed the stale window.location Safari bug from jQuery hashchange event in BBQ, which was the main reason for the previous release!  
 1.2   - (2/16/2009) Integrated jQuery hashchange event v1.2, which fixes a Safari bug, the event can now be bound before DOM ready, and IE6/7 page should no longer scroll when the event is first bound. Also added the jQuery.param.fragment.noEscape method, and reworked the hashchange event (BBQ) internal "add" method to be compatible with changes made to the jQuery 1.4.2 special events API.  
 1.1.1 - (1/22/2010) Integrated jQuery hashchange event v1.1, which fixes an obscure IE8 EmulateIE7 meta tag compatibility mode bug.  
 1.1   - (1/9/2010) Broke out the jQuery BBQ event.special hashchange event functionality into a separate plugin for users who want just the basic event & back button support, without all the extra awesomeness that BBQ provides. This plugin will be included as part of jQuery BBQ, but also be available separately. See jQuery hashchange event plugin for more information. Also added the jQuery.bbq.removeState method and added additional jQuery.deparam examples.  

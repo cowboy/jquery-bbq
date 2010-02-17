@@ -1,5 +1,5 @@
 /*!
- * jQuery BBQ: Back Button & Query Library - v1.2 - 2/16/2010
+ * jQuery BBQ: Back Button & Query Library - v1.2.1 - 2/17/2010
  * http://benalman.com/projects/jquery-bbq-plugin/
  * 
  * Copyright (c) 2010 "Cowboy" Ben Alman
@@ -9,7 +9,7 @@
 
 // Script: jQuery BBQ: Back Button & Query Library
 //
-// *Version: 1.2, Last updated: 2/16/2010*
+// *Version: 1.2.1, Last updated: 2/17/2010*
 // 
 // Project Home - http://benalman.com/projects/jquery-bbq-plugin/
 // GitHub       - http://github.com/cowboy/jquery-bbq/
@@ -45,6 +45,9 @@
 // 
 // About: Release History
 // 
+// 1.2.1 - (2/17/2009) Actually fixed the stale window.location Safari bug from
+//         <jQuery hashchange event> in BBQ, which was the main reason for the
+//         previous release!
 // 1.2   - (2/16/2009) Integrated <jQuery hashchange event> v1.2, which fixes a
 //         Safari bug, the event can now be bound before DOM ready, and IE6/7
 //         page should no longer scroll when the event is first bound. Also
@@ -79,7 +82,6 @@
   
   // Some convenient shortcuts.
   var undefined,
-    loc = window.location,
     aps = Array.prototype.slice,
     decode = decodeURIComponent,
     
@@ -99,6 +101,7 @@
     str_querystring = 'querystring',
     str_fragment = 'fragment',
     str_elemUrlAttr = 'elemUrlAttr',
+    str_location = 'location',
     str_href = 'href',
     str_src = 'src',
     
@@ -296,7 +299,7 @@
     } else {
       // If URL was passed in, parse params from URL string, otherwise parse
       // params from window.location.
-      result = get_func( url !== undefined ? url : loc[ str_href ] );
+      result = get_func( url !== undefined ? url : window[ str_location ][ str_href ] );
     }
     
     return result;
@@ -712,12 +715,13 @@
     
     var has_args = params !== undefined,
       // Merge params into window.location using $.param.fragment.
-      url = jq_param_fragment( loc[ str_href ], has_args ? params : {}, has_args ? merge_mode : 2 );
+      url = jq_param_fragment( window[ str_location ][ str_href ],
+        has_args ? params : {}, has_args ? merge_mode : 2 );
     
     // Set new window.location.href. If hash is empty, use just # to prevent
     // browser from reloading the page. Note that Safari 3 & Chrome barf on
     // location.hash = '#'.
-    loc[ str_href ] = url + ( /#/.test( url ) ? '' : '#' );
+    window[ str_location ][ str_href ] = url + ( /#/.test( url ) ? '' : '#' );
   };
   
   // Method: jQuery.bbq.getState
