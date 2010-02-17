@@ -48,7 +48,9 @@
 // 1.2   - (2/16/2009) Integrated <jQuery hashchange event> v1.2, which fixes a
 //         Safari bug, the event can now be bound before DOM ready, and IE6/7
 //         page should no longer scroll when the event is first bound. Also
-//         added the <jQuery.param.fragment.noEscape> method.
+//         added the <jQuery.param.fragment.noEscape> method, and reworked the
+//         <hashchange event (BBQ)> internal "add" method to be compatible with
+//         changes made to the jQuery 1.4.2 special events API.
 // 1.1.1 - (1/22/2010) Integrated <jQuery hashchange event> v1.1, which fixes an
 //         obscure IE8 EmulateIE7 meta tag compatibility mode bug.
 // 1.1   - (1/9/2010) Broke out the jQuery BBQ event.special <hashchange event>
@@ -796,7 +798,7 @@
     jq_bbq_pushState( state, 2 );
   };
   
-  // Event: window.onhashchange
+  // Event: hashchange event (BBQ)
   // 
   // Usage in 1.4 and newer:
   // 
@@ -834,6 +836,8 @@
   // 
   // Additional Notes:
   // 
+  // * Due to changes in the special events API, jQuery BBQ v1.2 or newer is
+  //   required to enable the augmented event object in jQuery 1.4.2 and newer.
   // * See <jQuery hashchange event> for more detailed information.
   
   jq_event_special[ str_hashchange ] = $.extend( jq_event_special[ str_hashchange ], {
