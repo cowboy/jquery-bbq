@@ -45,10 +45,10 @@
 // 
 // About: Release History
 // 
-// 1.2.1 - (2/17/2009) Actually fixed the stale window.location Safari bug from
+// 1.2.1 - (2/17/2010) Actually fixed the stale window.location Safari bug from
 //         <jQuery hashchange event> in BBQ, which was the main reason for the
 //         previous release!
-// 1.2   - (2/16/2009) Integrated <jQuery hashchange event> v1.2, which fixes a
+// 1.2   - (2/16/2010) Integrated <jQuery hashchange event> v1.2, which fixes a
 //         Safari bug, the event can now be bound before DOM ready, and IE6/7
 //         page should no longer scroll when the event is first bound. Also
 //         added the <jQuery.param.fragment.noEscape> method, and reworked the

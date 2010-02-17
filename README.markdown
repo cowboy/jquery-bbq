@@ -54,8 +54,8 @@ Safari: Back Button from a different domain
 
 ## Release History ##
 
-1.2.1 - (2/17/2009) Actually fixed the stale window.location Safari bug from jQuery hashchange event in BBQ, which was the main reason for the previous release!  
-1.2   - (2/16/2009) Integrated jQuery hashchange event v1.2, which fixes a Safari bug, the event can now be bound before DOM ready, and IE6/7 page should no longer scroll when the event is first bound. Also added the jQuery.param.fragment.noEscape method, and reworked the hashchange event (BBQ) internal "add" method to be compatible with changes made to the jQuery 1.4.2 special events API.  
+1.2.1 - (2/17/2010) Actually fixed the stale window.location Safari bug from jQuery hashchange event in BBQ, which was the main reason for the previous release!  
+1.2   - (2/16/2010) Integrated jQuery hashchange event v1.2, which fixes a Safari bug, the event can now be bound before DOM ready, and IE6/7 page should no longer scroll when the event is first bound. Also added the jQuery.param.fragment.noEscape method, and reworked the hashchange event (BBQ) internal "add" method to be compatible with changes made to the jQuery 1.4.2 special events API.  
 1.1.1 - (1/22/2010) Integrated jQuery hashchange event v1.1, which fixes an obscure IE8 EmulateIE7 meta tag compatibility mode bug.  
 1.1   - (1/9/2010) Broke out the jQuery BBQ event.special hashchange event functionality into a separate plugin for users who want just the basic event & back button support, without all the extra awesomeness that BBQ provides. This plugin will be included as part of jQuery BBQ, but also be available separately. See jQuery hashchange event plugin for more information. Also added the jQuery.bbq.removeState method and added additional jQuery.deparam examples.  
 1.0.3 - (12/2/2009) Fixed an issue in IE 6 where location.search and location.hash would report incorrectly if the hash contained the ? character. Also jQuery.param.querystring and jQuery.param.fragment will no longer parse params out of a URL that doesn't contain ? or #, respectively.  
