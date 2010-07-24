@@ -189,8 +189,7 @@
   // 
   // Returns:
   // 
-  //  (String) Either a params string with urlencoded data or a URL with a
-  //    urlencoded query string in the format 'a=b&c=d&e=f'.
+  //  (String) A URL with a urlencoded query string in the format '?a=b&c=d&e=f'.
   
   // Method: jQuery.param.fragment
   // 
@@ -238,8 +237,7 @@
   // 
   // Returns:
   // 
-  //  (String) Either a params string with urlencoded data or a URL with a
-  //    urlencoded fragment (hash) in the format 'a=b&c=d&e=f'.
+  //  (String) A URL with a urlencoded fragment (hash) in the format '#a=b&c=d&e=f'.
   
   function jq_param_sub( is_fragment, get_func, url, params, merge_mode ) {
     var result,
