@@ -160,8 +160,8 @@ test( 'jQuery.param.querystring - build URL', function() {
     
     function(result){
       var params = old_jquery
-        ? 'a=4&a=5&a=6&c=2&b=[object+Object]'
-        : 'a[]=4&a[]=5&a[]=6&c=2&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=';
+        ? 'a=4&a=5&a=6&b=[object+Object]&c=2'
+        : 'a[]=4&a[]=5&a[]=6&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=&c=2';
       
       equals( current_url, pre + fake_encode( params ) + post, '$.param.querystring( url, Object, 1 )' );
     },
@@ -170,8 +170,8 @@ test( 'jQuery.param.querystring - build URL', function() {
     
     function(result){
       var params = old_jquery
-        ? 'a=4&a=5&a=6&c=2&b=[object+Object]&foo=1'
-        : 'a[]=4&a[]=5&a[]=6&c=2&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=&foo=1';
+        ? 'a=4&a=5&a=6&b=[object+Object]&c=2&foo=1'
+        : 'a[]=4&a[]=5&a[]=6&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=&c=2&foo=1';
       
       equals( current_url, pre + fake_encode( params ) + post, '$.param.querystring( url, String )' );
     },
@@ -180,8 +180,8 @@ test( 'jQuery.param.querystring - build URL', function() {
     
     function(result){
       var params = old_jquery
-        ? 'foo=1&bar=3&a=4&a=5&a=6&c=2&b=[object+Object]'
-        : 'foo=1&bar=3&a[]=4&a[]=5&a[]=6&c=2&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=';
+        ? 'a=4&a=5&a=6&b=[object+Object]&bar=3&c=2&foo=1'
+        : 'a[]=4&a[]=5&a[]=6&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=&bar=3&c=2&foo=1';
       
       equals( current_url, pre + fake_encode( params ) + post, '$.param.querystring( url, String, 1 )' );
     },
@@ -259,8 +259,8 @@ test( 'jQuery.param.fragment - build URL', function() {
     
     function(result){
       var params = old_jquery
-        ? 'a=4&a=5&a=6&c=2&b=[object+Object]'
-        : 'a[]=4&a[]=5&a[]=6&c=2&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=';
+        ? 'a=4&a=5&a=6&b=[object+Object]&c=2'
+        : 'a[]=4&a[]=5&a[]=6&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=&c=2';
       
       equals( current_url, pre + fake_encode( params ), '$.param.fragment( url, Object, 1 )' );
     },
@@ -269,8 +269,8 @@ test( 'jQuery.param.fragment - build URL', function() {
     
     function(result){
       var params = old_jquery
-        ? 'a=4&a=5&a=6&c=2&b=[object+Object]&foo=1'
-        : 'a[]=4&a[]=5&a[]=6&c=2&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=&foo=1';
+        ? 'a=4&a=5&a=6&b=[object+Object]&c=2&foo=1'
+        : 'a[]=4&a[]=5&a[]=6&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=&c=2&foo=1';
       
       equals( current_url, pre + fake_encode( params ), '$.param.fragment( url, String )' );
     },
@@ -279,8 +279,8 @@ test( 'jQuery.param.fragment - build URL', function() {
     
     function(result){
       var params = old_jquery
-        ? 'foo=1&bar=3&a=4&a=5&a=6&c=2&b=[object+Object]'
-        : 'foo=1&bar=3&a[]=4&a[]=5&a[]=6&c=2&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=';
+        ? 'a=4&a=5&a=6&b=[object+Object]&bar=3&c=2&foo=1'
+        : 'a[]=4&a[]=5&a[]=6&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=&bar=3&c=2&foo=1';
       
       equals( current_url, pre + fake_encode( params ), '$.param.fragment( url, String, 1 )' );
     },
@@ -465,8 +465,8 @@ test( 'jQuery.fn.querystring', function() {
     
     function(result){
       var params = old_jquery
-        ? 'a=4&a=5&a=6&c=2&b=[object+Object]'
-        : 'a[]=4&a[]=5&a[]=6&c=2&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=';
+        ? 'a=4&a=5&a=6&b=[object+Object]&c=2'
+        : 'a[]=4&a[]=5&a[]=6&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=&c=2';
       
       equals( current_url, pre + fake_encode( params ) + post, '$.fn.querystring( url, Object, 1 )' );
     },
@@ -475,8 +475,8 @@ test( 'jQuery.fn.querystring', function() {
     
     function(result){
       var params = old_jquery
-        ? 'a=4&a=5&a=6&c=2&b=[object+Object]&foo=1'
-        : 'a[]=4&a[]=5&a[]=6&c=2&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=&foo=1';
+        ? 'a=4&a=5&a=6&b=[object+Object]&c=2&foo=1'
+        : 'a[]=4&a[]=5&a[]=6&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=&c=2&foo=1';
       
       equals( current_url, pre + fake_encode( params ) + post, '$.fn.querystring( url, String )' );
     },
@@ -485,8 +485,8 @@ test( 'jQuery.fn.querystring', function() {
     
     function(result){
       var params = old_jquery
-        ? 'foo=1&bar=3&a=4&a=5&a=6&c=2&b=[object+Object]'
-        : 'foo=1&bar=3&a[]=4&a[]=5&a[]=6&c=2&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=';
+        ? 'a=4&a=5&a=6&b=[object+Object]&bar=3&c=2&foo=1'
+        : 'a[]=4&a[]=5&a[]=6&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=&bar=3&c=2&foo=1';
       
       equals( current_url, pre + fake_encode( params ) + post, '$.fn.querystring( url, String, 1 )' );
     },
@@ -581,8 +581,8 @@ test( 'jQuery.fn.fragment', function() {
     
     function(result){
       var params = old_jquery
-        ? 'a=4&a=5&a=6&c=2&b=[object+Object]'
-        : 'a[]=4&a[]=5&a[]=6&c=2&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=';
+        ? 'a=4&a=5&a=6&b=[object+Object]&c=2'
+        : 'a[]=4&a[]=5&a[]=6&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=&c=2';
       
       equals( current_url, pre + fake_encode( params ), '$.fn.fragment( url, Object, 1 )' );
     },
@@ -591,8 +591,8 @@ test( 'jQuery.fn.fragment', function() {
     
     function(result){
       var params = old_jquery
-        ? 'a=4&a=5&a=6&c=2&b=[object+Object]&foo=1'
-        : 'a[]=4&a[]=5&a[]=6&c=2&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=&foo=1';
+        ? 'a=4&a=5&a=6&b=[object+Object]&c=2&foo=1'
+        : 'a[]=4&a[]=5&a[]=6&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=&c=2&foo=1';
       
       equals( current_url, pre + fake_encode( params ), '$.fn.fragment( url, String )' );
     },
@@ -601,8 +601,8 @@ test( 'jQuery.fn.fragment', function() {
     
     function(result){
       var params = old_jquery
-        ? 'foo=1&bar=3&a=4&a=5&a=6&c=2&b=[object+Object]'
-        : 'foo=1&bar=3&a[]=4&a[]=5&a[]=6&c=2&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=';
+        ? 'a=4&a=5&a=6&b=[object+Object]&bar=3&c=2&foo=1'
+        : 'a[]=4&a[]=5&a[]=6&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=&bar=3&c=2&foo=1';
       
       equals( current_url, pre + fake_encode( params ), '$.fn.fragment( url, String, 1 )' );
     },

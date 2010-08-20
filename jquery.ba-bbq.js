@@ -1,5 +1,5 @@
 /*!
- * jQuery BBQ: Back Button & Query Library - v1.3pre - 7/24/2010
+ * jQuery BBQ: Back Button & Query Library - v1.3pre - 8/20/2010
  * http://benalman.com/projects/jquery-bbq-plugin/
  * 
  * Copyright (c) 2010 "Cowboy" Ben Alman
@@ -9,7 +9,7 @@
 
 // Script: jQuery BBQ: Back Button & Query Library
 //
-// *Version: 1.3pre, Last updated: 7/24/2010*
+// *Version: 1.3pre, Last updated: 8/20/2010*
 // 
 // Project Home - http://benalman.com/projects/jquery-bbq-plugin/
 // GitHub       - http://github.com/cowboy/jquery-bbq/
@@ -45,10 +45,12 @@
 // 
 // About: Release History
 // 
-// 1.3pre- (7/24/2010) Integrated <jQuery hashchange event> v1.3, which adds
+// 1.3pre - (8/20/2010) Integrated <jQuery hashchange event> v1.3, which adds
 //         document.title and document.domain support in IE6/7, BlackBerry
 //         support, better Iframe hiding for accessibility reasons, and the new
-//         $.fn.hashchange "shortcut" method.
+//         <jQuery.fn.hashchange> "shortcut" method. Added the
+//         <jQuery.param.sorted> method which reduces the possibility of
+//         extraneous hashchange event triggering.
 // 1.2.1 - (2/17/2010) Actually fixed the stale window.location Safari bug from
 //         <jQuery hashchange event> in BBQ, which was the main reason for the
 //         previous release!
@@ -91,6 +93,7 @@
     
     // Method / object references.
     jq_param = $.param,
+    jq_param_sorted,
     jq_param_fragment,
     jq_deparam,
     jq_deparam_fragment,
@@ -282,8 +285,8 @@
           : merge_mode === 1  ? $.extend( {}, params, url_params )  // url params override passed params
           : $.extend( {}, url_params, params );                     // passed params override url params
         
-        // Convert params object to a string.
-        qs = jq_param( qs );
+        // Convert params object into a sorted params string.
+        qs = jq_param_sorted( qs );
         
         // Unescape characters specified via $.param.noEscape. Since only hash-
         // history users have requested this feature, it's only enabled for
@@ -309,6 +312,56 @@
   
   jq_param[ str_querystring ]                  = curry( jq_param_sub, 0, get_querystring );
   jq_param[ str_fragment ] = jq_param_fragment = curry( jq_param_sub, 1, get_fragment );
+  
+  // Method: jQuery.param.sorted
+  // 
+  // Returns a params string equivalent to that returned by the internal
+  // jQuery.param method, but sorted, which makes it suitable for use as a
+  // cache key.
+  // 
+  // For example, in most browsers jQuery.param({z:1,a:2}) returns "z=1&a=2"
+  // and jQuery.param({a:2,z:1}) returns "a=2&z=1". Even though both the
+  // objects being serialized and the resulting params strings are equivalent,
+  // if these params strings were set into the location.hash fragment
+  // sequentially, the hashchange event would be triggered unnecessarily, since
+  // the strings are different (even though the data described by them is the
+  // same). By sorting the params string, unecessary hashchange event triggering
+  // can be avoided.
+  // 
+  // Usage:
+  // 
+  // > jQuery.param.sorted( obj [, traditional ] );
+  // 
+  // Arguments:
+  // 
+  //  obj - (Object) An object to be serialized.
+  //  traditional - (Boolean) Params deep/shallow serialization mode. See the
+  //    documentation at http://api.jquery.com/jQuery.param/ for more detail.
+  // 
+  // Returns:
+  // 
+  //  (String) A sorted params string.
+  
+  jq_param.sorted = jq_param_sorted = function( a, traditional ) {
+    var arr = [],
+      obj = {};
+    
+    $.each( jq_param( a, traditional ).split( '&' ), function(i,v){
+      var key = v.replace( /(?:%5B|=).*$/, '' ),
+        key_obj = obj[ key ];
+      
+      if ( !key_obj ) {
+        key_obj = obj[ key ] = [];
+        arr.push( key );
+      }
+      
+      key_obj.push( v );
+    });
+    
+    return $.map( arr.sort(), function(v){
+      return obj[ v ];
+    }).join( '&' );
+  };
   
   // Method: jQuery.param.fragment.noEscape
   // 
