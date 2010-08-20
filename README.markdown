@@ -1,7 +1,7 @@
 # jQuery BBQ: Back Button & Query Library #
 [http://benalman.com/projects/jquery-bbq-plugin/](http://benalman.com/projects/jquery-bbq-plugin/)
 
-Version: 1.2.1, Last updated: 2/17/2010
+Version: 1.3pre, Last updated: 8/20/2010
 
 jQuery BBQ enables simple, yet powerful bookmarkable #hash history via a cross-browser window.onhashchange event. In addition, jQuery BBQ provides a full jQuery.deparam() method, along with both fragment and query string parse and merge utility methods.
 
@@ -27,10 +27,10 @@ tested with, what browsers it has been tested in, and where the unit tests
 reside (so you can test it yourself).
 
 ### jQuery Versions ###
-1.3.2, 1.4.1, 1.4.2
+1.2.6, 1.3.2, 1.4.1, 1.4.2
 
 ### Browsers Tested ###
-Internet Explorer 6-8, Firefox 2-3.7, Safari 3-4, Chrome 4-5, Opera 9.6-10.1.
+Internet Explorer 6-8, Firefox 2-4, Chrome 5-6, Safari 3.2-5, Opera 9.6-10.60, iPhone 3.1, Android 1.6-2.2, BlackBerry 4.6-5.
 
 ### Unit Tests ###
 [http://benalman.com/code/projects/jquery-bbq/unit/](http://benalman.com/code/projects/jquery-bbq/unit/)
@@ -54,6 +54,7 @@ Safari: Back Button from a different domain
 
 ## Release History ##
 
+1.3pre - (8/20/2010) Integrated jQuery hashchange event v1.3, which adds document.title and document.domain support in IE6/7, BlackBerry support, better Iframe hiding for accessibility reasons, and the new jQuery.fn.hashchange "shortcut" method. Added the jQuery.param.sorted method which reduces the possibility of extraneous hashchange event triggering.  
 1.2.1 - (2/17/2010) Actually fixed the stale window.location Safari bug from jQuery hashchange event in BBQ, which was the main reason for the previous release!  
 1.2   - (2/16/2010) Integrated jQuery hashchange event v1.2, which fixes a Safari bug, the event can now be bound before DOM ready, and IE6/7 page should no longer scroll when the event is first bound. Also added the jQuery.param.fragment.noEscape method, and reworked the hashchange event (BBQ) internal "add" method to be compatible with changes made to the jQuery 1.4.2 special events API.  
 1.1.1 - (1/22/2010) Integrated jQuery hashchange event v1.1, which fixes an obscure IE8 EmulateIE7 meta tag compatibility mode bug.  

@@ -72,6 +72,53 @@ var params_obj = { a:['4','5','6'], b:{x:['7'], y:'8', z:['9','0','true','false'
   params_str = params_init,
   params_str_old = 'a=4&a=5&a=6&b=[object+Object]&c=1';
 
+test( 'jQuery.param.sorted', function() {
+  var tests = [
+    {
+      obj: {z:1,b:2,ab:3,bc:4,ba:5,aa:6,a1:7,x:8},
+      traditional: false,
+      expected: 'a1=7&aa=6&ab=3&b=2&ba=5&bc=4&x=8&z=1'
+    },
+    {
+      obj: {z:1,b:[6,5,4],x:2,a:[3,2,1]},
+      traditional: false,
+      expected: 'a[]=3&a[]=2&a[]=1&b[]=6&b[]=5&b[]=4&x=2&z=1',
+      expected_old: 'a=3&a=2&a=1&b=6&b=5&b=4&x=2&z=1'
+    },
+    {
+      obj: {z:1,b:[6,5,4],x:2,a:[3,2,1]},
+      traditional: true,
+      expected: 'a=3&a=2&a=1&b=6&b=5&b=4&x=2&z=1'
+    },
+    {
+      obj: {a:[[4,[5,6]],[[7,8],9]]},
+      traditional: false,
+      expected: 'a[0][]=4&a[0][1][]=5&a[0][1][]=6&a[1][0][]=7&a[1][0][]=8&a[1][]=9',
+      expected_old: 'a=4,5,6&a=7,8,9' // obviously not great, but that's the way jQuery used to roll
+    }
+  ];
+  
+  if ( $.fn.jquery != '1.4.1' ) {
+    // this explodes in jQuery 1.4.1
+    tests.push({
+      obj: {z:1,'b[]':[6,5,4],x:2,'a[]':[3,2,1]},
+      obj_alt: {z:1,b:[6,5,4],x:2,a:[3,2,1]},
+      traditional: false,
+      expected: 'a[]=3&a[]=2&a[]=1&b[]=6&b[]=5&b[]=4&x=2&z=1'
+    });
+  }
+  
+  expect( tests.length * 2 );
+  
+  $.each( tests, function(i,test){
+    var unsorted = $.param( test.obj, test.traditional ),
+      sorted = $.param.sorted( test.obj, test.traditional );
+    
+    equals( decodeURIComponent( sorted ), old_jquery && test.expected_old || test.expected, 'params should be sorted' );
+    same( $.deparam( unsorted, true ), $.deparam( sorted, true ), 'sorted params should deparam the same as unsorted params' )
+  });
+});
+
 test( 'jQuery.param.querystring', function() {
   expect( 11 );
   
