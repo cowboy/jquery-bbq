@@ -1,5 +1,5 @@
 /*!
- * jQuery BBQ: Back Button & Query Library - v1.3pre - 8/20/2010
+ * jQuery BBQ: Back Button & Query Library - v1.3pre - 8/26/2010
  * http://benalman.com/projects/jquery-bbq-plugin/
  * 
  * Copyright (c) 2010 "Cowboy" Ben Alman
@@ -9,7 +9,7 @@
 
 // Script: jQuery BBQ: Back Button & Query Library
 //
-// *Version: 1.3pre, Last updated: 8/20/2010*
+// *Version: 1.3pre, Last updated: 8/26/2010*
 // 
 // Project Home - http://benalman.com/projects/jquery-bbq-plugin/
 // GitHub       - http://github.com/cowboy/jquery-bbq/
@@ -45,12 +45,14 @@
 // 
 // About: Release History
 // 
-// 1.3pre - (8/20/2010) Integrated <jQuery hashchange event> v1.3, which adds
+// 1.3pre - (8/26/2010) Integrated <jQuery hashchange event> v1.3, which adds
 //         document.title and document.domain support in IE6/7, BlackBerry
 //         support, better Iframe hiding for accessibility reasons, and the new
 //         <jQuery.fn.hashchange> "shortcut" method. Added the
 //         <jQuery.param.sorted> method which reduces the possibility of
-//         extraneous hashchange event triggering.
+//         extraneous hashchange event triggering. Added the
+//         <jQuery.param.fragment.ajaxCrawlable> method which can be used to
+//         enable Google "AJAX Crawlable mode."
 // 1.2.1 - (2/17/2010) Actually fixed the stale window.location Safari bug from
 //         <jQuery hashchange event> in BBQ, which was the main reason for the
 //         previous release!
@@ -108,14 +110,17 @@
     str_querystring = 'querystring',
     str_fragment = 'fragment',
     str_elemUrlAttr = 'elemUrlAttr',
-    str_location = 'location',
     str_href = 'href',
     str_src = 'src',
     
     // Reused RegExp.
-    re_trim_querystring = /^.*\?|#.*$/g,
-    re_trim_fragment = /^.*\#/,
+    re_params_querystring = /^.*\?|#.*$/g,
+    re_params_fragment,
+    re_fragment,
     re_no_escape,
+    
+    ajax_crawlable,
+    fragment_prefix,
     
     // Used by jQuery.elemUrlAttr.
     elemUrlAttr_cache = {};
@@ -139,7 +144,7 @@
   // Get location.hash (or what you'd expect location.hash to be) sans any
   // leading #. Thanks for making this necessary, Firefox!
   function get_fragment( url ) {
-    return url.replace( /^[^#]*#?(.*)$/, '$1' );
+    return url.replace( re_fragment, '$2' );
   };
   
   // Get location.search (or what you'd expect location.search to be) sans any
@@ -259,7 +264,7 @@
       // matches[1] = url part that precedes params, not including trailing ?/#
       // matches[2] = params, not including leading ?/#
       // matches[3] = if in 'querystring' mode, hash including leading #, otherwise ''
-      matches = url.match( is_fragment ? /^([^#]*)\#?(.*)$/ : /^([^#?]*)\??([^#]*)(#?.*)/ );
+      matches = url.match( is_fragment ? re_fragment : /^([^#?]*)\??([^#]*)(#?.*)/ );
       
       // Get the hash if in 'querystring' mode, and it exists.
       hash = matches[3] || '';
@@ -267,7 +272,7 @@
       if ( merge_mode === 2 && is_string( params ) ) {
         // If merge_mode is 2 and params is a string, merge the fragment / query
         // string into the URL wholesale, without converting it into an object.
-        qs = params.replace( is_fragment ? re_trim_fragment : re_trim_querystring, '' );
+        qs = params.replace( is_fragment ? re_params_fragment : re_params_querystring, '' );
         
       } else {
         // Convert relevant params in url to object.
@@ -299,12 +304,12 @@
       // Build URL from the base url, querystring and hash. In 'querystring'
       // mode, ? is only added if a query string exists. In 'fragment' mode, #
       // is always added.
-      result = matches[1] + ( is_fragment ? '#' : qs || !matches[1] ? '?' : '' ) + qs + hash;
+      result = matches[1] + ( is_fragment ? fragment_prefix : qs || !matches[1] ? '?' : '' ) + qs + hash;
       
     } else {
       // If URL was passed in, parse params from URL string, otherwise parse
       // params from window.location.
-      result = get_func( url !== undefined ? url : window[ str_location ][ str_href ] );
+      result = get_func( url !== undefined ? url : location.href );
     }
     
     return result;
@@ -400,6 +405,41 @@
   // A sensible default. These are the characters people seem to complain about
   // "uglifying up the URL" the most.
   jq_param_fragment.noEscape( ',/' );
+  
+  // Method: jQuery.param.fragment.ajaxCrawlable
+  // 
+  // TODO: DESCRIBE
+  // 
+  // Usage:
+  // 
+  // > jQuery.param.fragment.ajaxCrawlable( [ state ] );
+  // 
+  // Arguments:
+  // 
+  //  state - (Boolean) TODO: DESCRIBE
+  // 
+  // Returns:
+  // 
+  //  (Boolean) The current ajaxCrawlable state.
+  
+  jq_param_fragment.ajaxCrawlable = function( state ) {
+    if ( state !== undefined ) {
+      if ( state ) {
+        re_params_fragment = /^.*(?:#!|#)/;
+        re_fragment = /^([^#]*)(?:#!|#)?(.*)$/;
+        fragment_prefix = '#!';
+      } else {
+        re_params_fragment = /^.*#/;
+        re_fragment = /^([^#]*)#?(.*)$/;
+        fragment_prefix = '#';
+      }
+      ajax_crawlable = !!state;
+    }
+    
+    return ajax_crawlable;
+  };
+  
+  jq_param_fragment.ajaxCrawlable( 0 );
   
   // Section: Deparam (from string)
   // 
@@ -566,7 +606,7 @@
       url_or_params = jq_param[ is_fragment ? str_fragment : str_querystring ]();
     } else {
       url_or_params = is_string( url_or_params )
-        ? url_or_params.replace( is_fragment ? re_trim_fragment : re_trim_querystring, '' )
+        ? url_or_params.replace( is_fragment ? re_params_fragment : re_params_querystring, '' )
         : url_or_params;
     }
     
@@ -770,13 +810,12 @@
     
     var has_args = params !== undefined,
       // Merge params into window.location using $.param.fragment.
-      url = jq_param_fragment( window[ str_location ][ str_href ],
+      url = jq_param_fragment( location.href,
         has_args ? params : {}, has_args ? merge_mode : 2 );
     
-    // Set new window.location.href. If hash is empty, use just # to prevent
-    // browser from reloading the page. Note that Safari 3 & Chrome barf on
-    // location.hash = '#'.
-    window[ str_location ][ str_href ] = url + ( /#/.test( url ) ? '' : '#' );
+    // Set new window.location.href. Note that Safari 3 & Chrome barf on
+    // location.hash = '#' so the entire URL is set.
+    location.href = url;
   };
   
   // Method: jQuery.bbq.getState

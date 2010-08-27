@@ -7,7 +7,8 @@ $(function(){ // START CLOSURE
 var old_jquery = $.fn.jquery < '1.4',
   is_chrome = /chrome/i.test( navigator.userAgent ),
   params_init = 'a[]=4&a[]=5&a[]=6&b[x][]=7&b[y]=8&b[z][]=9&b[z][]=0&b[z][]=true&b[z][]=false&b[z][]=undefined&b[z][]=&c=1',
-  init_url
+  init_url,
+  ajaxcrawlable_init = $.param.fragment.ajaxCrawlable(),
   aps = Array.prototype.slice;
 
 if ( $.param.querystring() !== params_init || $.param.fragment() !== params_init ) {
@@ -70,7 +71,12 @@ module( 'jQuery.param' );
 var params_obj = { a:['4','5','6'], b:{x:['7'], y:'8', z:['9','0','true','false','undefined','']}, c:'1' },
   params_obj_coerce = { a:[4,5,6], b:{x:[7], y:8, z:[9,0,true,false,undefined,'']}, c:1 },
   params_str = params_init,
-  params_str_old = 'a=4&a=5&a=6&b=[object+Object]&c=1';
+  params_str_old = 'a=4&a=5&a=6&b=[object+Object]&c=1',
+  
+  // If a params fragment starts with ! and BBQ is not in ajaxCrawlable mode,
+  // things can get very ugly, very quickly.
+  params_obj_bang = { "!a":['4'], a:['5','6'], b:{x:['7'], y:'8', z:['9','0','true','false','undefined','']}, c:'1' },
+  params_obj_bang_coerce = { "!a":[4], a:[5,6], b:{x:[7], y:8, z:[9,0,true,false,undefined,'']}, c:1 };
 
 test( 'jQuery.param.sorted', function() {
   var tests = [
@@ -108,7 +114,7 @@ test( 'jQuery.param.sorted', function() {
     });
   }
   
-  expect( tests.length * 2 );
+  expect( tests.length * 2 + 6 );
   
   $.each( tests, function(i,test){
     var unsorted = $.param( test.obj, test.traditional ),
@@ -117,6 +123,14 @@ test( 'jQuery.param.sorted', function() {
     equals( decodeURIComponent( sorted ), old_jquery && test.expected_old || test.expected, 'params should be sorted' );
     same( $.deparam( unsorted, true ), $.deparam( sorted, true ), 'sorted params should deparam the same as unsorted params' )
   });
+  
+  equals( $.param.fragment( 'foo', '#b=2&a=1' ), 'foo#a=1&b=2', 'params should be sorted' );
+  equals( $.param.fragment( 'foo', '#b=2&a=1', 1 ), 'foo#a=1&b=2', 'params should be sorted' );
+  equals( $.param.fragment( 'foo', '#b=2&a=1', 2 ), 'foo#b=2&a=1', 'params should NOT be sorted' );
+  equals( $.param.fragment( 'foo#c=3&a=4', '#b=2&a=1' ), 'foo#a=1&b=2&c=3', 'params should be sorted' );
+  equals( $.param.fragment( 'foo#c=3&a=4', '#b=2&a=1', 1 ), 'foo#a=4&b=2&c=3', 'params should be sorted' );
+  equals( $.param.fragment( 'foo#c=3&a=4', '#b=2&a=1', 2 ), 'foo#b=2&a=1', 'params should NOT be sorted' );
+  
 });
 
 test( 'jQuery.param.querystring', function() {
@@ -134,25 +148,6 @@ test( 'jQuery.param.querystring', function() {
   equals( $.param.querystring( 'foo.html?' + params_str ), params_str, 'params string from url' );
   equals( $.param.querystring( 'http://a:b@example.com:1234/foo.html?' + params_str ), params_str, 'params string from url' );
   equals( $.param.querystring( 'http://a:b@example.com:1234/foo.html?' + params_str + '#bippity-boppity-boo' ), params_str, 'params string from url' );
-});
-
-test( 'jQuery.param.fragment', function() {
-  expect( 12 );
-  
-  equals( $.param.fragment( 'http://example.com/' ), '', 'properly identifying params' );
-  equals( $.param.fragment( 'http://example.com/?foo' ),'', 'properly identifying params' );
-  equals( $.param.fragment( 'http://example.com/?foo#bar' ),'bar', 'properly identifying params' );
-  equals( $.param.fragment( 'http://example.com/?foo#bar?baz' ),'bar?baz', 'properly identifying params' );
-  equals( $.param.fragment( 'http://example.com/#foo' ),'foo', 'properly identifying params' );
-  equals( $.param.fragment( 'http://example.com/#foo?bar' ),'foo?bar', 'properly identifying params' );
-  
-  equals( $.param.fragment(), params_str, 'params string from window.location' );
-  equals( $.param.fragment( '#' + params_str ), params_str, 'params string from url' );
-  equals( $.param.fragment( 'foo.html#' + params_str ), params_str, 'params string from url' );
-  equals( $.param.fragment( 'http://a:b@example.com:1234/foo.html#' + params_str ), params_str, 'params string from url' );
-  equals( $.param.fragment( 'http://a:b@example.com:1234/foo.html?bippity-boppity-boo#' + params_str ), params_str, 'params string from url' );
-  
-  equals( $.param.fragment( '#', { foo: '/a,b@c$d+e&f=g h' } ), '#foo=/a,b%40c%24d%2Be%26f%3Dg+h', '/, should be unescaped, everything else but space (+) should be urlencoded' );
 });
 
 test( 'jQuery.param.querystring - build URL', function() {
@@ -255,8 +250,51 @@ test( 'jQuery.param.querystring - build URL', function() {
   
 });
 
+test( 'jQuery.param.fragment', function() {
+  expect( 29 );
+  
+  equals( $.param.fragment( 'http://example.com/' ), '', 'properly identifying params' );
+  equals( $.param.fragment( 'http://example.com/?foo' ),'', 'properly identifying params' );
+  equals( $.param.fragment( 'http://example.com/?foo#bar' ),'bar', 'properly identifying params' );
+  equals( $.param.fragment( 'http://example.com/?foo#bar?baz' ),'bar?baz', 'properly identifying params' );
+  equals( $.param.fragment( 'http://example.com/#foo' ),'foo', 'properly identifying params' );
+  equals( $.param.fragment( 'http://example.com/#foo?bar' ),'foo?bar', 'properly identifying params' );
+  
+  equals( $.param.fragment( 'http://example.com/' ), '', 'properly identifying params' );
+  equals( $.param.fragment( 'http://example.com/?foo' ),'', 'properly identifying params' );
+  equals( $.param.fragment( 'http://example.com/?foo#!bar' ),'!bar', 'properly identifying params' );
+  equals( $.param.fragment( 'http://example.com/?foo#!bar?baz' ),'!bar?baz', 'properly identifying params' );
+  equals( $.param.fragment( 'http://example.com/#!foo' ),'!foo', 'properly identifying params' );
+  equals( $.param.fragment( 'http://example.com/#!foo?bar' ),'!foo?bar', 'properly identifying params' );
+  
+  equals( $.param.fragment(), params_str, 'params string from window.location' );
+  equals( $.param.fragment( '#' + params_str ), params_str, 'params string from url' );
+  equals( $.param.fragment( 'foo.html#' + params_str ), params_str, 'params string from url' );
+  equals( $.param.fragment( 'http://a:b@example.com:1234/foo.html#' + params_str ), params_str, 'params string from url' );
+  equals( $.param.fragment( 'http://a:b@example.com:1234/foo.html?bippity-boppity-boo#' + params_str ), params_str, 'params string from url' );
+  
+  $.param.fragment.ajaxCrawlable( true );
+  
+  equals( $.param.fragment( 'http://example.com/' ), '', 'properly identifying params' );
+  equals( $.param.fragment( 'http://example.com/?foo' ),'', 'properly identifying params' );
+  equals( $.param.fragment( 'http://example.com/?foo#bar' ),'bar', 'properly identifying params' );
+  equals( $.param.fragment( 'http://example.com/?foo#bar?baz' ),'bar?baz', 'properly identifying params' );
+  equals( $.param.fragment( 'http://example.com/#foo' ),'foo', 'properly identifying params' );
+  equals( $.param.fragment( 'http://example.com/#foo?bar' ),'foo?bar', 'properly identifying params' );
+  
+  equals( $.param.fragment( 'http://example.com/' ), '', 'properly identifying params' );
+  equals( $.param.fragment( 'http://example.com/?foo' ),'', 'properly identifying params' );
+  equals( $.param.fragment( 'http://example.com/?foo#!bar' ),'bar', 'properly identifying params' );
+  equals( $.param.fragment( 'http://example.com/?foo#!bar?baz' ),'bar?baz', 'properly identifying params' );
+  equals( $.param.fragment( 'http://example.com/#!foo' ),'foo', 'properly identifying params' );
+  equals( $.param.fragment( 'http://example.com/#!foo?bar' ),'foo?bar', 'properly identifying params' );
+  
+  $.param.fragment.ajaxCrawlable( false );
+  
+});
+
 test( 'jQuery.param.fragment - build URL', function() {
-  expect( 10 );
+  expect( 40 );
   
   function fake_encode( params_str ) {
     return '#' + $.map( params_str.split('&'), encodeURIComponent ).join('&').replace( /%3D/g, '=' ).replace( /%2B/g, '+' );
@@ -352,7 +390,71 @@ test( 'jQuery.param.fragment - build URL', function() {
     
   );
   
+  $.param.fragment.ajaxCrawlable( true );
+  
+  equals( $.param.fragment( 'foo', {} ) , 'foo#!', '$.param.fragment( url, Object )' );
+  equals( $.param.fragment( 'foo', { b:2, a:1 } ) , 'foo#!a=1&b=2', '$.param.fragment( url, Object )' );
+  equals( $.param.fragment( 'foo#', { b:2, a:1 } ) , 'foo#!a=1&b=2', '$.param.fragment( url, Object )' );
+  equals( $.param.fragment( 'foo#!', { b:2, a:1 } ) , 'foo#!a=1&b=2', '$.param.fragment( url, Object )' );
+  equals( $.param.fragment( 'foo#c=3&a=4', { b:2, a:1 } ) , 'foo#!a=1&b=2&c=3', '$.param.fragment( url, Object )' );
+  equals( $.param.fragment( 'foo#!c=3&a=4', { b:2, a:1 } ) , 'foo#!a=1&b=2&c=3', '$.param.fragment( url, Object )' );
+  
+  equals( $.param.fragment( 'foo', '' ) , 'foo#!', '$.param.fragment( url, String )' );
+  equals( $.param.fragment( 'foo', 'b=2&a=1' ) , 'foo#!a=1&b=2', '$.param.fragment( url, String )' );
+  equals( $.param.fragment( 'foo#', 'b=2&a=1' ) , 'foo#!a=1&b=2', '$.param.fragment( url, String )' );
+  equals( $.param.fragment( 'foo#!', 'b=2&a=1' ) , 'foo#!a=1&b=2', '$.param.fragment( url, String )' );
+  equals( $.param.fragment( 'foo#c=3&a=4', 'b=2&a=1' ) , 'foo#!a=1&b=2&c=3', '$.param.fragment( url, String )' );
+  equals( $.param.fragment( 'foo#!c=3&a=4', 'b=2&a=1' ) , 'foo#!a=1&b=2&c=3', '$.param.fragment( url, String )' );
+  
+  equals( $.param.fragment( 'foo', '#' ) , 'foo#!', '$.param.fragment( url, String )' );
+  equals( $.param.fragment( 'foo', '#b=2&a=1' ) , 'foo#!a=1&b=2', '$.param.fragment( url, String )' );
+  equals( $.param.fragment( 'foo#', '#b=2&a=1' ) , 'foo#!a=1&b=2', '$.param.fragment( url, String )' );
+  equals( $.param.fragment( 'foo#!', '#b=2&a=1' ) , 'foo#!a=1&b=2', '$.param.fragment( url, String )' );
+  equals( $.param.fragment( 'foo#c=3&a=4', '#b=2&a=1' ) , 'foo#!a=1&b=2&c=3', '$.param.fragment( url, String )' );
+  equals( $.param.fragment( 'foo#!c=3&a=4', '#b=2&a=1' ) , 'foo#!a=1&b=2&c=3', '$.param.fragment( url, String )' );
+  
+  equals( $.param.fragment( 'foo', '#!' ) , 'foo#!', '$.param.fragment( url, String )' );
+  equals( $.param.fragment( 'foo', '#!b=2&a=1' ) , 'foo#!a=1&b=2', '$.param.fragment( url, String )' );
+  equals( $.param.fragment( 'foo#', '#!b=2&a=1' ) , 'foo#!a=1&b=2', '$.param.fragment( url, String )' );
+  equals( $.param.fragment( 'foo#!', '#!b=2&a=1' ) , 'foo#!a=1&b=2', '$.param.fragment( url, String )' );
+  equals( $.param.fragment( 'foo#c=3&a=4', '#!b=2&a=1' ) , 'foo#!a=1&b=2&c=3', '$.param.fragment( url, String )' );
+  equals( $.param.fragment( 'foo#!c=3&a=4', '#!b=2&a=1' ) , 'foo#!a=1&b=2&c=3', '$.param.fragment( url, String )' );
+  
+  $.param.fragment.ajaxCrawlable( false );
+  
+  // If a params fragment starts with ! and BBQ is not in ajaxCrawlable mode,
+  // things can get very ugly, very quickly.
+  equals( $.param.fragment( 'foo', '#!' ) , 'foo#!=', '$.param.fragment( url, String )' );
+  equals( $.param.fragment( 'foo', '#!b=2&a=1' ) , 'foo#!b=2&a=1', '$.param.fragment( url, String )' );
+  equals( $.param.fragment( 'foo#', '#!b=2&a=1' ) , 'foo#!b=2&a=1', '$.param.fragment( url, String )' );
+  equals( $.param.fragment( 'foo#!', '#!b=2&a=1' ) , 'foo#!=&!b=2&a=1', '$.param.fragment( url, String )' );
+  equals( $.param.fragment( 'foo#c=3&a=4', '#!b=2&a=1' ) , 'foo#!b=2&a=1&c=3', '$.param.fragment( url, String )' );
+  equals( $.param.fragment( 'foo#!c=3&a=4', '#!b=2&a=1' ) , 'foo#!b=2&!c=3&a=1', '$.param.fragment( url, String )' );
+  
 });
+
+test( 'jQuery.param.fragment.ajaxCrawlable', function() {
+  expect( 5 );
+  
+  equals( ajaxcrawlable_init, false, 'ajaxCrawlable is disabled by default' );
+  equals( $.param.fragment.ajaxCrawlable( true ), true, 'enabling ajaxCrawlable should return true' );
+  equals( $.param.fragment.ajaxCrawlable(), true, 'ajaxCrawlable is now enabled' );
+  equals( $.param.fragment.ajaxCrawlable( false ), false, 'disabling ajaxCrawlable should return false' );
+  equals( $.param.fragment.ajaxCrawlable(), false, 'ajaxCrawlable is now disabled' );
+});
+
+test( 'jQuery.param.fragment.noEscape', function() {
+  expect( 2 );
+  
+  equals( $.param.fragment( '#', { foo: '/a,b@c$d+e&f=g h!' } ), '#foo=/a,b%40c%24d%2Be%26f%3Dg+h!', '/, should be unescaped, everything else but space (+) should be urlencoded' );
+  
+  $.param.fragment.ajaxCrawlable( true );
+  
+  equals( $.param.fragment( '#', { foo: '/a,b@c$d+e&f=g h!' } ), '#!foo=/a,b%40c%24d%2Be%26f%3Dg+h!', '/, should be unescaped, everything else but ! and space (+) should be urlencoded' );
+  
+  $.param.fragment.ajaxCrawlable( false );
+});
+
 
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -394,12 +496,13 @@ test( 'jQuery.deparam.querystring', function() {
 });
 
 test( 'jQuery.deparam.fragment', function() {
-  expect( 12 );
+  expect( 36 );
   
   same( $.deparam.fragment(), params_obj, 'params obj from window.location' );
   same( $.deparam.fragment( true ), params_obj_coerce, 'params obj from window.location, coerced' );
   same( $.deparam.fragment( params_str ), params_obj, 'params obj from string' );
   same( $.deparam.fragment( params_str, true ), params_obj_coerce, 'params obj from string, coerced' );
+  
   same( $.deparam.fragment( '#' + params_str ), params_obj, 'params obj from string' );
   same( $.deparam.fragment( '#' + params_str, true ), params_obj_coerce, 'params obj from string, coerced' );
   same( $.deparam.fragment( 'foo.html#' + params_str ), params_obj, 'params obj from string' );
@@ -408,6 +511,39 @@ test( 'jQuery.deparam.fragment', function() {
   same( $.deparam.fragment( 'http://a:b@example.com:1234/foo.html#' + params_str, true ), params_obj_coerce, 'params obj from string, coerced' );
   same( $.deparam.fragment( 'http://a:b@example.com:1234/foo.html?bippity-boppity-boo#' + params_str ), params_obj, 'params obj from string' );
   same( $.deparam.fragment( 'http://a:b@example.com:1234/foo.html?bippity-boppity-boo#' + params_str, true ), params_obj_coerce, 'params obj from string, coerced' );
+  
+  // If a params fragment starts with ! and BBQ is not in ajaxCrawlable mode,
+  // things can get very ugly, very quickly.
+  same( $.deparam.fragment( '#!' + params_str ), params_obj_bang, 'params obj from string' );
+  same( $.deparam.fragment( '#!' + params_str, true ), params_obj_bang_coerce, 'params obj from string, coerced' );
+  same( $.deparam.fragment( 'foo.html#!' + params_str ), params_obj_bang, 'params obj from string' );
+  same( $.deparam.fragment( 'foo.html#!' + params_str, true ), params_obj_bang_coerce, 'params obj from string, coerced' );
+  same( $.deparam.fragment( 'http://a:b@example.com:1234/foo.html#!' + params_str ), params_obj_bang, 'params obj from string' );
+  same( $.deparam.fragment( 'http://a:b@example.com:1234/foo.html#!' + params_str, true ), params_obj_bang_coerce, 'params obj from string, coerced' );
+  same( $.deparam.fragment( 'http://a:b@example.com:1234/foo.html?bippity-boppity-boo#!' + params_str ), params_obj_bang, 'params obj from string' );
+  same( $.deparam.fragment( 'http://a:b@example.com:1234/foo.html?bippity-boppity-boo#!' + params_str, true ), params_obj_bang_coerce, 'params obj from string, coerced' );
+  
+  $.param.fragment.ajaxCrawlable( true );
+  
+  same( $.deparam.fragment( '#' + params_str ), params_obj, 'params obj from string' );
+  same( $.deparam.fragment( '#' + params_str, true ), params_obj_coerce, 'params obj from string, coerced' );
+  same( $.deparam.fragment( 'foo.html#' + params_str ), params_obj, 'params obj from string' );
+  same( $.deparam.fragment( 'foo.html#' + params_str, true ), params_obj_coerce, 'params obj from string, coerced' );
+  same( $.deparam.fragment( 'http://a:b@example.com:1234/foo.html#' + params_str ), params_obj, 'params obj from string' );
+  same( $.deparam.fragment( 'http://a:b@example.com:1234/foo.html#' + params_str, true ), params_obj_coerce, 'params obj from string, coerced' );
+  same( $.deparam.fragment( 'http://a:b@example.com:1234/foo.html?bippity-boppity-boo#' + params_str ), params_obj, 'params obj from string' );
+  same( $.deparam.fragment( 'http://a:b@example.com:1234/foo.html?bippity-boppity-boo#' + params_str, true ), params_obj_coerce, 'params obj from string, coerced' );
+  
+  same( $.deparam.fragment( '#!' + params_str ), params_obj, 'params obj from string' );
+  same( $.deparam.fragment( '#!' + params_str, true ), params_obj_coerce, 'params obj from string, coerced' );
+  same( $.deparam.fragment( 'foo.html#!' + params_str ), params_obj, 'params obj from string' );
+  same( $.deparam.fragment( 'foo.html#!' + params_str, true ), params_obj_coerce, 'params obj from string, coerced' );
+  same( $.deparam.fragment( 'http://a:b@example.com:1234/foo.html#!' + params_str ), params_obj, 'params obj from string' );
+  same( $.deparam.fragment( 'http://a:b@example.com:1234/foo.html#!' + params_str, true ), params_obj_coerce, 'params obj from string, coerced' );
+  same( $.deparam.fragment( 'http://a:b@example.com:1234/foo.html?bippity-boppity-boo#!' + params_str ), params_obj, 'params obj from string' );
+  same( $.deparam.fragment( 'http://a:b@example.com:1234/foo.html?bippity-boppity-boo#!' + params_str, true ), params_obj_coerce, 'params obj from string, coerced' );
+  
+  $.param.fragment.ajaxCrawlable( false );
 });
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -561,7 +697,7 @@ test( 'jQuery.fn.querystring', function() {
 });
 
 test( 'jQuery.fn.fragment', function() {
-  expect( 60 );
+  expect( 240 );
   
   function fake_encode( params_str ) {
     return '#' + $.map( params_str.split('&'), encodeURIComponent ).join('&').replace( /%3D/g, '=' ).replace( /%2B/g, '+' );
@@ -573,25 +709,8 @@ test( 'jQuery.fn.fragment', function() {
   run_many_tests(
     
     // execute this for each array item
-    function(){
-      var container,
-        elems;
-      
-      container = init_url_attr( container, current_url );
-      elems = container.children('span');
-      equals( elems.length, 1, 'select the correct elements' );
-      equals( elems.fragment.apply( elems, [ 'arbitrary_attr' ].concat( aps.call( arguments ) ) ), elems, 'pass fragment' );
-      
-      container = init_url_attr( container, current_url );
-      elems = container.children('a, link');
-      equals( elems.length, 2, 'select the correct elements' );
-      equals( elems.fragment.apply( elems, [ 'href' ].concat( aps.call( arguments ) ) ), elems, 'pass fragment' );
-      
-      container = init_url_attr( container, current_url );
-      elems = container.children();
-      equals( elems.fragment.apply( elems, aps.call( arguments ) ), elems, 'pass fragment' );
-      
-      current_url = test_url_attr( container );
+    function( params, merge_mode ){
+      current_url = test_fn_fragment( current_url, params, merge_mode );
     },
     
     // tests:
@@ -674,6 +793,68 @@ test( 'jQuery.fn.fragment', function() {
     
   );
   
+  $.param.fragment.ajaxCrawlable( true );
+  
+  function test_fn_fragment( url, params, merge_mode ) {
+    var container,
+      elems;
+    
+    container = init_url_attr( container, url );
+    elems = container.children('span');
+    equals( elems.length, 1, 'select the correct elements' );
+    equals( elems.fragment( 'arbitrary_attr', params, merge_mode ), elems, 'pass fragment' );
+    
+    container = init_url_attr( container, url );
+    elems = container.children('a, link');
+    equals( elems.length, 2, 'select the correct elements' );
+    equals( elems.fragment( params, merge_mode ), elems, 'pass fragment' );
+    
+    container = init_url_attr( container, url );
+    elems = container.children();
+    equals( elems.fragment( params, merge_mode ), elems, 'pass fragment' );
+    
+    return test_url_attr( container );
+  };
+  
+  equals( test_fn_fragment( 'foo', {} ) , 'foo#!', '$.fn.fragment( url, Object )' );
+  equals( test_fn_fragment( 'foo', { b:2, a:1 } ) , 'foo#!a=1&b=2', '$.fn.fragment( url, Object )' );
+  equals( test_fn_fragment( 'foo#', { b:2, a:1 } ) , 'foo#!a=1&b=2', '$.fn.fragment( url, Object )' );
+  equals( test_fn_fragment( 'foo#!', { b:2, a:1 } ) , 'foo#!a=1&b=2', '$.fn.fragment( url, Object )' );
+  equals( test_fn_fragment( 'foo#c=3&a=4', { b:2, a:1 } ) , 'foo#!a=1&b=2&c=3', '$.fn.fragment( url, Object )' );
+  equals( test_fn_fragment( 'foo#!c=3&a=4', { b:2, a:1 } ) , 'foo#!a=1&b=2&c=3', '$.fn.fragment( url, Object )' );
+  
+  equals( test_fn_fragment( 'foo', '' ) , 'foo#!', '$.fn.fragment( url, String )' );
+  equals( test_fn_fragment( 'foo', 'b=2&a=1' ) , 'foo#!a=1&b=2', '$.fn.fragment( url, String )' );
+  equals( test_fn_fragment( 'foo#', 'b=2&a=1' ) , 'foo#!a=1&b=2', '$.fn.fragment( url, String )' );
+  equals( test_fn_fragment( 'foo#!', 'b=2&a=1' ) , 'foo#!a=1&b=2', '$.fn.fragment( url, String )' );
+  equals( test_fn_fragment( 'foo#c=3&a=4', 'b=2&a=1' ) , 'foo#!a=1&b=2&c=3', '$.fn.fragment( url, String )' );
+  equals( test_fn_fragment( 'foo#!c=3&a=4', 'b=2&a=1' ) , 'foo#!a=1&b=2&c=3', '$.fn.fragment( url, String )' );
+  
+  equals( test_fn_fragment( 'foo', '#' ) , 'foo#!', '$.fn.fragment( url, String )' );
+  equals( test_fn_fragment( 'foo', '#b=2&a=1' ) , 'foo#!a=1&b=2', '$.fn.fragment( url, String )' );
+  equals( test_fn_fragment( 'foo#', '#b=2&a=1' ) , 'foo#!a=1&b=2', '$.fn.fragment( url, String )' );
+  equals( test_fn_fragment( 'foo#!', '#b=2&a=1' ) , 'foo#!a=1&b=2', '$.fn.fragment( url, String )' );
+  equals( test_fn_fragment( 'foo#c=3&a=4', '#b=2&a=1' ) , 'foo#!a=1&b=2&c=3', '$.fn.fragment( url, String )' );
+  equals( test_fn_fragment( 'foo#!c=3&a=4', '#b=2&a=1' ) , 'foo#!a=1&b=2&c=3', '$.fn.fragment( url, String )' );
+  
+  equals( test_fn_fragment( 'foo', '#!' ) , 'foo#!', '$.fn.fragment( url, String )' );
+  equals( test_fn_fragment( 'foo', '#!b=2&a=1' ) , 'foo#!a=1&b=2', '$.fn.fragment( url, String )' );
+  equals( test_fn_fragment( 'foo#', '#!b=2&a=1' ) , 'foo#!a=1&b=2', '$.fn.fragment( url, String )' );
+  equals( test_fn_fragment( 'foo#!', '#!b=2&a=1' ) , 'foo#!a=1&b=2', '$.fn.fragment( url, String )' );
+  equals( test_fn_fragment( 'foo#c=3&a=4', '#!b=2&a=1' ) , 'foo#!a=1&b=2&c=3', '$.fn.fragment( url, String )' );
+  equals( test_fn_fragment( 'foo#!c=3&a=4', '#!b=2&a=1' ) , 'foo#!a=1&b=2&c=3', '$.fn.fragment( url, String )' );
+  
+  $.param.fragment.ajaxCrawlable( false );
+  
+  // If a params fragment starts with ! and BBQ is not in ajaxCrawlable mode,
+  // things can get very ugly, very quickly.
+  equals( test_fn_fragment( 'foo', '#!' ) , 'foo#!=', '$.fn.fragment( url, String )' );
+  equals( test_fn_fragment( 'foo', '#!b=2&a=1' ) , 'foo#!b=2&a=1', '$.fn.fragment( url, String )' );
+  equals( test_fn_fragment( 'foo#', '#!b=2&a=1' ) , 'foo#!b=2&a=1', '$.fn.fragment( url, String )' );
+  equals( test_fn_fragment( 'foo#!', '#!b=2&a=1' ) , 'foo#!=&!b=2&a=1', '$.fn.fragment( url, String )' );
+  equals( test_fn_fragment( 'foo#c=3&a=4', '#!b=2&a=1' ) , 'foo#!b=2&a=1&c=3', '$.fn.fragment( url, String )' );
+  equals( test_fn_fragment( 'foo#!c=3&a=4', '#!b=2&a=1' ) , 'foo#!b=2&!c=3&a=1', '$.fn.fragment( url, String )' );
+  
 });
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -682,9 +863,9 @@ test( 'jQuery.fn.fragment', function() {
 module( 'jQuery.bbq' );
 
 test( 'jQuery.bbq.pushState(), jQuery.bbq.getState(), jQuery.bbq.removeState(), window.onhashchange', function() {
-  expect( old_jquery ? 85 : 157 );
+  expect( old_jquery ? 95 : 167 );
   
-  var a, b, c, d, e, f, x, y, hash, obj, event, msg = 'Testing window.onhashchange and history';
+  var a, b, c, d, e, f, x, y, hash, hash_actual, obj, event, msg = 'Testing window.onhashchange and history';
   
   $.bbq.pushState();
   equals( window.location.hash.replace( /^#/, ''), '', 'window.location hash should be empty' );
@@ -699,6 +880,7 @@ test( 'jQuery.bbq.pushState(), jQuery.bbq.getState(), jQuery.bbq.removeState(), 
     
     event = evt;
     hash = $.param.fragment();
+    hash_actual = location.hash;
     obj = { str: $.bbq.getState(), coerce: $.bbq.getState( true ) };
     a = { str: $.bbq.getState( 'a' ), coerce: $.bbq.getState( 'a', true ) };
     b = { str: $.bbq.getState( 'b' ), coerce: $.bbq.getState( 'b', true ) };
@@ -741,6 +923,7 @@ test( 'jQuery.bbq.pushState(), jQuery.bbq.getState(), jQuery.bbq.removeState(), 
     [ { a:'2' } ],
     
     function(result){
+      equals( hash_actual, '#' + hash, 'hash should begin with #!' );
       same( obj.str, { a:'2', b:'1' }, '$.bbq.getState()' );
       same( obj.coerce, { a:2, b:1 },  '$.bbq.getState( true )' );
       equals( a.str, '2', '$.bbq.getState( "a" )' );
@@ -756,6 +939,7 @@ test( 'jQuery.bbq.pushState(), jQuery.bbq.getState(), jQuery.bbq.removeState(), 
     [ { b:'2' } ],
     
     function(result){
+      equals( hash_actual, '#' + hash, 'hash should begin with #!' );
       same( obj.str, { a:'2', b:'2' }, '$.bbq.getState()' );
       same( obj.coerce, { a:2, b:2 },  '$.bbq.getState( true )' );
       equals( b.str, '2', '$.bbq.getState( "b" )' );
@@ -771,6 +955,7 @@ test( 'jQuery.bbq.pushState(), jQuery.bbq.getState(), jQuery.bbq.removeState(), 
     [ { c:true, d:false, e:'undefined', f:'' } ],
     
     function(result){
+      equals( hash_actual, '#' + hash, 'hash should begin with #!' );
       same( obj.str, { a:'2', b:'2', c:'true', d:'false', e:'undefined', f:'' }, '$.bbq.getState()' );
       same( obj.coerce, { a:2, b:2, c:true, d:false, e:undefined, f:'' },  '$.bbq.getState( true )' );
       equals( c.str, 'true', '$.bbq.getState( "c" )' );
@@ -796,10 +981,15 @@ test( 'jQuery.bbq.pushState(), jQuery.bbq.getState(), jQuery.bbq.removeState(), 
     },
     
     function(result){
+      $.param.fragment.ajaxCrawlable( true );
+    },
+    
+    function(result){
       $.bbq.removeState( 'c' );
     },
     
     function(result){
+      equals( hash_actual, '#!' + hash, 'hash should begin with #!' );
       same( obj.str, { a:'2', b:'2', d:'false', e:'undefined', f:'' }, '$.bbq.getState()' );
       same( obj.coerce, { a:2, b:2, d:false, e:undefined, f:'' },  '$.bbq.getState( true )' );
       equals( a.str, '2', '$.bbq.getState( "a" )' );
@@ -837,6 +1027,7 @@ test( 'jQuery.bbq.pushState(), jQuery.bbq.getState(), jQuery.bbq.removeState(), 
     },
     
     function(result){
+      equals( hash_actual, '#!' + hash, 'hash should begin with #!' );
       same( obj.str, { a:'2', b:'2' }, '$.bbq.getState()' );
       same( obj.coerce, { a:2, b:2 },  '$.bbq.getState( true )' );
       equals( a.str, '2', '$.bbq.getState( "a" )' );
@@ -874,6 +1065,7 @@ test( 'jQuery.bbq.pushState(), jQuery.bbq.getState(), jQuery.bbq.removeState(), 
     },
     
     function(result){
+      equals( hash_actual, '#!', 'hash should just be #!' );
       same( obj.str, {}, '$.bbq.getState()' );
       same( obj.coerce, {},  '$.bbq.getState( true )' );
       equals( a.str, undefined, '$.bbq.getState( "a" )' );
@@ -918,6 +1110,7 @@ test( 'jQuery.bbq.pushState(), jQuery.bbq.getState(), jQuery.bbq.removeState(), 
           ? '[object Object]'
           : {x:[7], y:8, z:[9,0,true,false,undefined,'']};
       
+      equals( hash_actual, '#!' + hash, 'hash should begin with #!' );
       same( obj.str, { a:['4','5','6'], b:b_str }, '$.bbq.getState()' );
       same( obj.coerce, { a:[4,5,6], b:b_coerce },  '$.bbq.getState( true )' );
       same( a.str, ['4','5','6'], '$.bbq.getState( "a" )' );
@@ -940,6 +1133,7 @@ test( 'jQuery.bbq.pushState(), jQuery.bbq.getState(), jQuery.bbq.removeState(), 
           ? '[object Object]'
           : {x:[7], y:8, z:[9,0,true,false,undefined,'']};
       
+      equals( hash_actual, '#!' + hash, 'hash should begin with #!' );
       same( obj.str, { a:['4','5','6'], b:b_str, c:'2' }, '$.bbq.getState()' );
       same( obj.coerce, { a:[4,5,6], b:b_coerce, c:2 },  '$.bbq.getState( true )' );
       if ( !old_jquery ) {
@@ -951,6 +1145,7 @@ test( 'jQuery.bbq.pushState(), jQuery.bbq.getState(), jQuery.bbq.removeState(), 
     [ '#/path/to/file.php', 2 ],
     
     function(result){
+      equals( hash_actual, '#!' + hash, 'hash should begin with #!' );
       equals( hash, '/path/to/file.php', '$.param.fragment()' );
       if ( !old_jquery ) {
         equals( event.fragment, '/path/to/file.php', 'event.fragment' );
@@ -960,6 +1155,7 @@ test( 'jQuery.bbq.pushState(), jQuery.bbq.getState(), jQuery.bbq.removeState(), 
     [],
     
     function(result){
+      equals( hash_actual, '#!', 'hash should just be #!' );
       equals( hash, '', '$.param.fragment()' );
       if ( !old_jquery ) {
         equals( event.fragment, '', 'event.fragment' );
@@ -1037,6 +1233,10 @@ test( 'jQuery.bbq.pushState(), jQuery.bbq.getState(), jQuery.bbq.removeState(), 
       $(window).unbind( 'hashchange' );
       var events = $.data( window, 'events' );
       ok( !events || !events.hashchange, 'hashchange event unbound' );
+    },
+    
+    function(result){
+      $.param.fragment.ajaxCrawlable( false );
     },
     
     [ '#all_done' ]
