@@ -31,7 +31,11 @@ function draw_shell() {
 <html lang="en">
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
-  <title>Ben Alman &raquo; <?= $shell['title1'] ?><? if ( $shell['title2'] ) { print ' &raquo; ' . $shell['title2']; } ?><? if ( $shell['title3'] ) { print ' &raquo; ' . $shell['title3']; } ?></title>
+  <title>
+    <? if ( $shell['title'] ) { print $shell['title']; } else { ?>
+    Ben Alman &raquo; <?= $shell['title1'] ?><? if ( $shell['title2'] ) { print ' &raquo; ' . $shell['title2']; } ?><? if ( $shell['title3'] ) { print ' &raquo; ' . $shell['title3']; } ?>
+    <? } ?>
+  </title>
   <script type="text/javascript" src="<?= $base ?>../shared/ba-debug.js"></script>
   <?
   if ( $shell['jquery'] ) {

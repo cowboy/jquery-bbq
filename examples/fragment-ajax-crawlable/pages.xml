@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<pages>
+  <page id="" title="jQuery BBQ">
+    <img src="bbq.jpg" width="400" height="300"/>
+    <h1>jQuery BBQ</h1>
+    <p>Click a nav item above or below to load some delicious AJAX content! Also,
+      once the content loads, feel free to further explore our savory delights by
+      clicking any inline links you might see.</p>
+  </page>
+  <page id="404" title="Page not found" status="400">
+    <img src="bbq.jpg" width="400" height="300"/>
+    <h1>Page not found</h1>
+    <p>This is a 404 error page.</p>
+  </page>
+  <page id="burger" title="Delicious Burgers">
+    <img src="burger.jpg" width="400" height="300"/>
+    <h1>Delicious Burgers</h1>
+    <p>It might look like more food than you can eat, but trust me, you'll finish 
+    this burger. What, you say you're a vegetarian? Ok then, try the
+    <a href="#!chicken">Chicken</a>!</p>
+  </page>
+  <page id="chicken" title="Mesquite Rub Chicken">
+    <img src="chicken.jpg" width="400" height="300"/>
+    <h1>Mesquite Rub Chicken</h1>
+    <p>This spicy meal might have you begging for "cerveza" but you'll be coming back for 
+    seconds! Still hungry? Why not wash that chicken down with a heaping plate of
+    <a href="#!kebabs">Kebabs</a>?</p>
+  </page>
+  <page id="kebabs" title="Savory Shish-Kebabs">
+    <img src="kebabs.jpg" width="400" height="300"/>
+    <h1>Savory Shish-Kebabs</h1>
+    <p>Who doesn't like kebabs? Nobody! That's why this meat and veggie combo is sure
+    to blow your mind! Still, if you aren't in the mood for wooden sticks, why not let a
+    delicious <a href="#!burger">Burger</a> whet your appetite?</p>
+  </page>
+  <page id="kielbasa" title="Sweet Kielbasa">
+    <img src="kielbasa.jpg" width="400" height="300"/>
+    <h1>Sweet Kielbasa</h1>
+    <p>One bite of this kielbasa will have you asking for the recipe, and that's a fact.
+    But save some room, because while you're here, you've got to check out our fantastic
+    fall-off-the-bone <a href="#!ribs">Ribs</a>!</p>
+  </page>
+  <page id="ribs" title="Baby-Back Ribs">
+    <img src="ribs.jpg" width="400" height="300"/>
+    <h1>Baby-Back Ribs</h1>
+    <p>What's better than a half-rack of ribs? A full rack! And if you like ribs,
+    which you do, you're sure to love our perfectly seared flame-broiled
+    <a href="#!steak">Steak</a>!</p>
+  </page>
+  <page id="steak" title="Flame-Broiled Steak">
+    <img src="steak.jpg" width="400" height="300"/>
+    <h1>Flame-Broiled Steak</h1>
+    <p>Seasoned and cooked perfectly, this amazing steak aims to please! And if you
+    have room left over, don't forget to help yourself to a plate of our sweet
+    <a href="#!kielbasa">Kielbasa</a>!</p>
+  </page>
+</pages>
