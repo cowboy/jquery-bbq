@@ -16,7 +16,10 @@ $_REQUEST['_escaped_fragment_'] = isset($_REQUEST['_escaped_fragment_']) ?
 
 // Initialize the XMLpage, fetching the appropriate page's data.
 $page = new XMLpage(array( 
-            a
+                        'id' => $_REQUEST['_escaped_fragment_'] 
+                      )
+                    );
+
 // This is a special case for the 404 error page. Only if it is defined in the
 // XML and a page isn't found will a 404 header be set.
 if ( isset($page->attr['status']) && $page->attr['status'] == '404' ) {
