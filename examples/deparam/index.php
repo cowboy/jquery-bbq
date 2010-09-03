@@ -1,16 +1,20 @@
 <?PHP
+$GLOBALS['is_example']  = true;
 
-include "../index.php";
 
-$shell['title3'] = "jQuery.deparam";
+include '../index.php';
 
-$shell['h2'] = 'The opposite of jQuery.param, pretty much.';
+array_push($shell['titles'], 'jQuery.deparam');
+
+$shell['title3']  = "jQuery.deparam";
+$shell['h2']      = 'The opposite of jQuery.param, pretty much.';
 
 array_push( $shell['shBrush'], 'Php' );
 
 // ========================================================================== //
 // SCRIPT
 // ========================================================================== //
+
 
 ob_start();
 ?>
@@ -38,7 +42,7 @@ $(function(){
   });
   
 });
-<?
+<?php
 $shell['script'] = ob_get_contents();
 ob_end_clean();
 
@@ -59,7 +63,7 @@ window.JSON = null;
 <script type="text/javascript" src="../../jquery.ba-bbq.js"></script>
 <script type="text/javascript" language="javascript">
 
-<?= $shell['script']; ?>
+<?php echo  $shell['script']; ?>
 
 $(function(){
   
@@ -110,7 +114,7 @@ li {
 }
 
 </style>
-<?
+<?php 
 $shell['html_head'] = ob_get_contents();
 ob_end_clean();
 
@@ -120,7 +124,7 @@ ob_end_clean();
 
 ob_start();
 ?>
-<?= $shell['donate'] ?>
+<?php echo  $shell['donate'] ?>
 
 <p>
   <a href="http://benalman.com/projects/jquery-bbq-plugin/">jQuery BBQ</a> includes a powerful jQuery.deparam method that is capable of fully deserializing not only any params string that jQuery.param can create, but that PHP and Rails (and hopefully everything else) can create. And even though only the query string is being parsed this example, methods for parsing a params string out of the fragment (hash) as well parsing any stand-alone params string are included. jQuery BBQ can also be used to merge params from multiple URLs or objects into a new URL, even within element attributes. See <a href="../../docs/">the documentation</a> for a full list of methods!
@@ -145,7 +149,7 @@ ob_start();
 
 <h3>Urldecoded query string</h3>
 
-<?= urldecode( $_SERVER['QUERY_STRING'] ) ?>
+<?php echo  urldecode( $_SERVER['QUERY_STRING'] ) ?>
 
 
 <h3>Query string params, as parsed by jQuery BBQ (and converted to JSON)</h3>
@@ -167,17 +171,17 @@ ob_start();
 <p><code>print_r( $_GET );</code></p>
 
 <pre class="brush:php">
-<? print_r( $_GET ) ?>
+<?php  print_r( $_GET ) ?>
 </pre>
 
 
 <h3>The code</h3>
 
 <pre class="brush:js">
-<?= htmlspecialchars( $shell['script'] ); ?>
+<?php echo  htmlspecialchars( $shell['script'] ); ?>
 </pre>
 
-<?
+<?php 
 $shell['html_body'] = ob_get_contents();
 ob_end_clean();
 

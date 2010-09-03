@@ -1,16 +1,20 @@
 <?PHP
+$GLOBALS['is_example']  = true;
 
-include "../index.php";
 
-$shell['title3'] = "hashchange » jQuery UI Tabs";
+include '../index.php';
 
-$shell['h2'] = 'Multiple jQuery UI Tabs + fragment + history + bookmarking = Tasty!';
+array_push($shell['titles'], 'hashchange » jQuery UI Tabs');
 
+$shell['title3']  = "hashchange » jQuery UI Tabs";
+$shell['h2']      = 'Multiple jQuery UI Tabs + fragment + history + bookmarking = Tasty!';
 $shell['jquery'] = 'jquery-1.3.2.js';
+
 
 // ========================================================================== //
 // SCRIPT
 // ========================================================================== //
+
 
 ob_start();
 ?>
@@ -69,7 +73,7 @@ $(function(){
   $(window).trigger( 'hashchange' );
   
 });
-<?
+<?php 
 $shell['script'] = ob_get_contents();
 ob_end_clean();
 
@@ -85,7 +89,7 @@ ob_start();
 <script type="text/javascript" src="../../jquery.ba-bbq.js"></script>
 <script type="text/javascript" language="javascript">
 
-<?= $shell['script']; ?>
+<?php echo  $shell['script']; ?>
 
 $(function(){
   
@@ -138,7 +142,7 @@ ul li {
 }
 
 </style>
-<?
+<?php 
 $shell['html_head'] = ob_get_contents();
 ob_end_clean();
 
@@ -148,7 +152,7 @@ ob_end_clean();
 
 ob_start();
 ?>
-<?= $shell['donate'] ?>
+<?php echo  $shell['donate'] ?>
 
 <p>
   With <a href="http://benalman.com/projects/jquery-bbq-plugin/">jQuery BBQ</a> you can keep track of state, history and allow bookmarking multiple <a href="http://jqueryui.com/demos/tabs/">jQuery UI tab</a> widgets simultaneously.. just click some tabs, use your browser's back and next buttons, reload the page.. and when you're done playing, check out the code!
@@ -231,10 +235,10 @@ ob_start();
 <p>Note that a lot of the following code is very similar to the <a href="../fragment-advanced/">advanced window.onhashchange</a> example. That's intentional! They're functionally very similar, but this example is much less complicated due to jQuery UI Tabs' built-in functionality.</p>
 
 <pre class="brush:js">
-<?= htmlspecialchars( $shell['script'] ); ?>
+<?php echo  htmlspecialchars( $shell['script'] ); ?>
 </pre>
 
-<?
+<?php
 $shell['html_body'] = ob_get_contents();
 ob_end_clean();
 

@@ -1,14 +1,20 @@
 <?PHP
+$GLOBALS['is_example']  = true;
 
-include "../index.php";
 
-$shell['title3'] = "hashchange » Advanced";
+include '../index.php';
 
-$shell['h2'] = 'Cached AJAX + fragment + history + bookmarking = Tasty!';
+array_push($shell['titles'], "hashchange » Advanced");
+
+$shell['title3']  = "hashchange » Advanced";
+$shell['h2']      = 'Cached AJAX + fragment + history + bookmarking = Tasty!';
+
+
 
 // ========================================================================== //
 // SCRIPT
 // ========================================================================== //
+
 
 ob_start();
 ?>
@@ -109,7 +115,7 @@ $(function(){
   $(window).trigger( 'hashchange' );
   
 });
-<?
+<?php 
 $shell['script'] = ob_get_contents();
 ob_end_clean();
 
@@ -122,7 +128,7 @@ ob_start();
 <script type="text/javascript" src="../../jquery.ba-bbq.js"></script>
 <script type="text/javascript" language="javascript">
 
-<?= $shell['script']; ?>
+<?php echo  $shell['script']; ?>
 
 $(function(){
   
@@ -205,7 +211,7 @@ a.bbq-current {
 }
 
 </style>
-<?
+<?php 
 $shell['html_head'] = ob_get_contents();
 ob_end_clean();
 
@@ -215,7 +221,7 @@ ob_end_clean();
 
 ob_start();
 ?>
-<?= $shell['donate'] ?>
+<?php echo  $shell['donate'] ?>
 
 <p>
   With <a href="http://benalman.com/projects/jquery-bbq-plugin/">jQuery BBQ</a> you can keep track of state, history and allow bookmarking while dynamically modifying the page via AJAX and/or DHTML.. just click the links, use your browser's back and next buttons, reload the page.. and when you're done playing, check out the code!
@@ -291,10 +297,10 @@ ob_start();
 <p>Note that a lot of the following code is very similar to the <a href="../fragment-basic/">basic window.onhashchange</a> example. That's intentional! They're functionally very similar, but while this version is far more robust, it is somewhat more complex. Look at both to see which meets your needs, and don't be afraid to adapt. Also, if you want to see a robust AND simple implementation, be sure to check out the <a href="../fragment-jquery-ui-tabs/">jQuery UI Tabs</a> example.</p>
 
 <pre class="brush:js">
-<?= htmlspecialchars( $shell['script'] ); ?>
+<?php echo  htmlspecialchars( $shell['script'] ); ?>
 </pre>
 
-<?
+<?php 
 $shell['html_body'] = ob_get_contents();
 ob_end_clean();
 
