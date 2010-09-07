@@ -158,7 +158,7 @@
   // Method: jQuery.param.querystring
   // 
   // Retrieve the query string from a URL or if no arguments are passed, the
-  // current window.location.
+  // current window.location.href.
   // 
   // Usage:
   // 
@@ -167,7 +167,7 @@
   // Arguments:
   // 
   //  url - (String) A URL containing query string params to be parsed. If url
-  //    is not passed, the current window.location is used.
+  //    is not passed, the current window.location.href is used.
   // 
   // Returns:
   // 
@@ -206,7 +206,7 @@
   // Method: jQuery.param.fragment
   // 
   // Retrieve the fragment (hash) from a URL or if no arguments are passed, the
-  // current window.location.
+  // current window.location.href.
   // 
   // Usage:
   // 
@@ -215,7 +215,7 @@
   // Arguments:
   // 
   //  url - (String) A URL containing fragment (hash) params to be parsed. If
-  //    url is not passed, the current window.location is used.
+  //    url is not passed, the current window.location.href is used.
   // 
   // Returns:
   // 
@@ -308,7 +308,7 @@
       
     } else {
       // If URL was passed in, parse params from URL string, otherwise parse
-      // params from window.location.
+      // params from window.location.href.
       result = get_func( url !== undefined ? url : location.href );
     }
     
@@ -557,7 +557,7 @@
   
   // Method: jQuery.deparam.querystring
   // 
-  // Parse the query string from a URL or the current window.location,
+  // Parse the query string from a URL or the current window.location.href,
   // deserializing it into an object, optionally coercing numbers, booleans,
   // null and undefined values.
   // 
@@ -568,8 +568,8 @@
   // Arguments:
   // 
   //  url - (String) An optional params string or URL containing query string
-  //    params to be parsed. If url is omitted, the current window.location
-  //    is used.
+  //    params to be parsed. If url is omitted, the current
+  //    window.location.href is used.
   //  coerce - (Boolean) If true, coerces any numbers or true, false, null, and
   //    undefined to their actual value. Defaults to false if omitted.
   // 
@@ -579,7 +579,7 @@
   
   // Method: jQuery.deparam.fragment
   // 
-  // Parse the fragment (hash) from a URL or the current window.location,
+  // Parse the fragment (hash) from a URL or the current window.location.href,
   // deserializing it into an object, optionally coercing numbers, booleans,
   // null and undefined values.
   // 
@@ -590,7 +590,7 @@
   // Arguments:
   // 
   //  url - (String) An optional params string or URL containing fragment (hash)
-  //    params to be parsed. If url is omitted, the current window.location
+  //    params to be parsed. If url is omitted, the current window.location.href
   //    is used.
   //  coerce - (Boolean) If true, coerces any numbers or true, false, null, and
   //    undefined to their actual value. Defaults to false if omitted.
