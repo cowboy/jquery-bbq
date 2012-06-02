@@ -1,5 +1,4 @@
 <?PHP
-
 /*!
  * XMLpage - v0.1pre - 8/30/2010
  * http://benalman.com/
@@ -17,6 +16,7 @@
 // Usage:
 // 
 // $page = new XMLpage(); // Initialize.
+// $page = new XMLpage(array('id' => `id`)); // Initialize.
 // 
 // $page->attr['id']      // The page node "id" attribute.
 // $page->attr['title']   // The page node "title" attribute.
@@ -33,37 +33,41 @@
 
 class XMLpage {
   
-  // Default options.
-  private $options = array(
-    'id' => '',
-    'xml' => 'pages.xml',
-    'fallback_ids' => array( '404', '' ),
-  );
+  private $dom, $xpath;
   
-  function XMLpage( $options = array() ) {
+  public  $page, 
+          $content, 
+          $attr     = array(), 
+          $options  = array(
+            'id'            => '',
+            'xml'           => 'pages.xml',
+            'fallback_ids'  => array( '404', '' )
+          );  
+  
+  public function __construct( $options = array() ) {
+  
     // Override any default options with passed options.
-    foreach ( $options as $key => $value ) {
-      $this->options[ $key ] = $value;
-    }
+    $this->options  = array_merge($this->options, $options);
     
     // Initialize XML and XPath objects.
-    $this->dom = new DOMDocument();
+    $this->dom      = new DOMDocument();
     $this->dom->load( $this->options['xml'] );
-    $this->xpath = new DOMXPath( $this->dom );
+    $this->xpath    = new DOMXPath( $this->dom );
     
     // While the requested id will always be tried first, in case that page
     // doesn't exist, the first page specified in `fallback_ids` will be used
     // instead.
-    $ids = $this->options['fallback_ids'];
-    array_unshift( $ids, $this->options['id'] );
+    array_unshift( $this->options['fallback_ids'], $this->options['id'] );
     
-    foreach ( $ids as $id ) {
+    foreach ( $this->options['fallback_ids'] as $id ) {
       // If `id` page is defined in the XML, load and initialize it.
       if ( $this->load_page( $id ) ) {
         $this->init_page( $id );
         break;
       }
     }
+    
+    return $this;
   }
   
   // Load a page node from the XML document and return true if successful.
@@ -83,12 +87,11 @@ class XMLpage {
     $this->content = $dom->saveHTML();
     
     // An array of attribute values.
-    $this->attr = array();
     foreach ( $this->page->attributes as $name => $node ) {
       $this->attr[ $name ] = $node->nodeValue;
     }
+    
+    return $this;
   }
   
 };
-
-?>

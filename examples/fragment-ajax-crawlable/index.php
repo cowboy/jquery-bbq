@@ -1,23 +1,41 @@
-<?PHP
+<?php
 
-include "../index.php";
+$GLOBALS['is_example']  = true;
+
+
+include '../index.php';
 
 // Include the XMLpage class.
-require "XMLpage.php";
+require 'XMLpage.php';
+
+
+//  Ensure that $_REQUEST['_escaped_fragment_'] has some form of declaration
+$_REQUEST['_escaped_fragment_'] = isset($_REQUEST['_escaped_fragment_']) ? 
+                                    $_REQUEST['_escaped_fragment_'] : 
+                                    '';
 
 // Initialize the XMLpage, fetching the appropriate page's data.
-$page = new XMLpage(array( 'id' => $_REQUEST['_escaped_fragment_'] ));
+$page = new XMLpage(array( 
+                        'id' => $_REQUEST['_escaped_fragment_'] 
+                      )
+                    );
 
 // This is a special case for the 404 error page. Only if it is defined in the
 // XML and a page isn't found will a 404 header be set.
-if ( $page->attr['status'] == '404' ) {
+if ( isset($page->attr['status']) && $page->attr['status'] == '404' ) {
   header( 'HTTP/1.0 404 Not Found' );
 }
 
-// Set the title appropriately, based on the XMLpage title attribute.
-$shell['title'] = $page->attr['title'];
 
-$shell['h2'] = 'Cached AJAX + fragment + history + bookmarking = Tasty!';
+// Set title as per my suggestion, as an override
+$shell['titles']  = array($page->attr['title']);
+
+// Set the title appropriately, based on the XMLpage title attribute.
+$shell['title']   = $page->attr['title'];
+$shell['h2']      = 'Cached AJAX + fragment + history + bookmarking = Tasty!';
+
+
+
 
 // ========================================================================== //
 // SCRIPT
@@ -34,7 +52,7 @@ $(function(){
   var cache = {
     // If url is '' (no fragment), display this div's content.
     '': {
-      title: "<?= $page->attr['title'] ?>",
+      title: "<?php echo  $page->attr['title'] ?>",
       elem: $('.bbq-item')
     }
   };
@@ -104,7 +122,7 @@ $(function(){
   $(window).trigger( 'hashchange' );
   
 });
-<?
+<?php
 $shell['script'] = ob_get_contents();
 ob_end_clean();
 
@@ -117,7 +135,9 @@ ob_start();
 <script type="text/javascript" src="../../jquery.ba-bbq.js"></script>
 <script type="text/javascript" language="javascript">
 
-<?= $shell['script']; ?>
+<?php 
+  echo  $shell['script']; 
+?>
 
 $(function(){
   
@@ -203,7 +223,7 @@ a.bbq-current {
 }
 
 </style>
-<?
+<?php 
 $shell['html_head'] = ob_get_contents();
 ob_end_clean();
 
@@ -213,7 +233,7 @@ ob_end_clean();
 
 ob_start();
 ?>
-<?= $shell['donate'] ?>
+<?php echo  $shell['donate'] ?>
 
 <p>
   With <a href="http://benalman.com/projects/jquery-bbq-plugin/">jQuery BBQ</a> you can keep track of state, history and allow bookmarking while dynamically modifying the page via AJAX and/or DHTML.. just click the links, use your browser's back and next buttons, reload the page.. and when you're done playing, check out the code!
@@ -244,7 +264,7 @@ ob_start();
     
     <!-- This content will be shown if no path is specified in the URL fragment. -->
     <div class="bbq-item">
-      <?= $page->content ?>
+      <?php echo  $page->content ?>
     </div>
     
   </div>
@@ -264,10 +284,10 @@ ob_start();
 <p>Note that a lot of the following code is very similar to the <a href="../fragment-advanced/">advanced window.onhashchange</a> example. That's intentional! They're functionally very similar, but while this version is far less robust, it is much more simple. Look at both to see which meets your needs, and don't be afraid to adapt. Also, if you want to see a robust AND simple implementation, be sure to check out the <a href="../fragment-jquery-ui-tabs/">jQuery UI Tabs</a> example.</p>
 
 <pre class="brush:js">
-<?= htmlspecialchars( $shell['script'] ); ?>
+<?php echo  htmlspecialchars( $shell['script'] ); ?>
 </pre>
 
-<?
+<?php 
 $shell['html_body'] = ob_get_contents();
 ob_end_clean();
 
