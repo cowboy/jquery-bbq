@@ -1286,9 +1286,7 @@
     // vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
     var ua = navigator.userAgent.toLowerCase();
     var browser = {
-      ieQuirks: null,
-      msie: /msie/.test(ua) && !/opera/.test(ua),
-      opera: /opera/.test(ua)
+      msie: /msie/.test(ua) && !/opera/.test(ua)
     };
     browser.msie && !supports_onhashchange && (function(){
       // Not only do IE6/7 need the "magical" Iframe treatment, but so does IE8
