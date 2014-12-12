@@ -1,3 +1,6 @@
+var jQuery = require('jquery');
+var jQueryBrowser = require('jquery.browser');
+
 /*!
  * jQuery BBQ: Back Button & Query Library - v1.3pre - 8/26/2010
  * http://benalman.com/projects/jquery-bbq-plugin/
@@ -1374,4 +1377,4 @@
     return self;
   })();
   
-})(jQuery,this);
+})(jQuery,window);
