@@ -1,0 +1,27 @@
+{
+  "name": "jquery-bbq",
+  "homepage": "https://github.com/TurnerBroadcasting/jquery-bbq",
+  "description": "",
+  "main": "jquery.ba-bbq.js",
+  "dependencies": {
+    "jquery": "1.4.0"
+  },
+  "keywords": [
+    "jquery",
+    "deparam"
+  ],
+  "authors": [
+    "Ben Alman"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "qunit": "^2.0.1"
+  }
+}
