@@ -550,7 +550,9 @@
       } else if ( key ) {
         // No value was defined, so set something meaningful.
         obj[key] = coerce
-          ? undefined
+          ? standaloneKeys
+            ? null
+            : undefined
           : '';
       }
     });
