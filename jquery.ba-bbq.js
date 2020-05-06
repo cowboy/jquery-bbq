@@ -451,19 +451,22 @@
   // 
   // Usage:
   // 
-  // > jQuery.deparam( params [, coerce ] );
+  // > jQuery.deparam( params [, coerce, standaloneKeys ] );
   // 
   // Arguments:
   // 
   //  params - (String) A params string to be parsed.
   //  coerce - (Boolean) If true, coerces any numbers or true, false, null, and
   //    undefined to their actual value. Defaults to false if omitted.
+  //  standaloneKeys - (Boolean) If true, keys without values are allowed in
+  //    the input string, and will be returned as null.  Defaults to false if
+  //    omitted.
   // 
   // Returns:
   // 
   //  (Object) An object representing the deserialized params string.
   
-  $.deparam = jq_deparam = function( params, coerce ) {
+  $.deparam = jq_deparam = function( params, coerce, standaloneKeys ) {
     var obj = {},
       coerce_types = { 'true': !0, 'false': !1, 'null': null };
     
