@@ -507,6 +507,14 @@
             ? null
             : undefined
           : '';
+
+        if (!standaloneKeys) {
+          // Backwards-compatibility:
+          // * Prior to the introduction of the standaloneKeys parameter, keys
+          //   without corresponding values would result in an undefined entry
+          keys_last = false;
+          obj[key] = undefined;
+        }
       }
 
       else if ( param.length === 2 ) {
