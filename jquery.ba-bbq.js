@@ -500,7 +500,19 @@
       }
       
       // Are we dealing with a name=value pair, or just a name?
-      if ( param.length === 1 && key ) {
+      if ( param.length === 2 ) {
+        val = decode( param[1] );
+        
+        // Coerce values.
+        if ( coerce ) {
+          val = val && !isNaN(val)            ? +val              // number
+            : val === 'undefined'             ? undefined         // undefined
+            : coerce_types[val] !== undefined ? coerce_types[val] // true, false, null
+            : val;                                                // string
+        }
+      }
+
+      else if ( param.length === 1 && key ) {
         // No value was defined, so set something meaningful.
         val = coerce
           ? standaloneKeys
@@ -514,18 +526,6 @@
           //   without corresponding values would result in an undefined entry
           keys_last = false;
           obj[key] = undefined;
-        }
-      }
-
-      else if ( param.length === 2 ) {
-        val = decode( param[1] );
-        
-        // Coerce values.
-        if ( coerce ) {
-          val = val && !isNaN(val)            ? +val              // number
-            : val === 'undefined'             ? undefined         // undefined
-            : coerce_types[val] !== undefined ? coerce_types[val] // true, false, null
-            : val;                                                // string
         }
       }
 
