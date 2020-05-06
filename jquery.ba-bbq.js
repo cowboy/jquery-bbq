@@ -500,7 +500,16 @@
       }
       
       // Are we dealing with a name=value pair, or just a name?
-      if ( param.length === 2 ) {
+      if ( param.length === 1 && key ) {
+        // No value was defined, so set something meaningful.
+        val = coerce
+          ? standaloneKeys
+            ? null
+            : undefined
+          : '';
+      }
+
+      else if ( param.length === 2 ) {
         val = decode( param[1] );
         
         // Coerce values.
@@ -510,6 +519,7 @@
             : coerce_types[val] !== undefined ? coerce_types[val] // true, false, null
             : val;                                                // string
         }
+      }
         
         if ( keys_last ) {
           // Complex key, build deep object structure based on a few rules:
@@ -528,7 +538,7 @@
               : val;
           }
           
-        } else {
+        } else if ( key ) {
           // Simple key, even simpler rules, since only scalars and shallow
           // arrays are allowed.
           
@@ -546,15 +556,6 @@
             obj[key] = val;
           }
         }
-        
-      } else if ( key ) {
-        // No value was defined, so set something meaningful.
-        obj[key] = coerce
-          ? standaloneKeys
-            ? null
-            : undefined
-          : '';
-      }
     });
     
     return obj;
