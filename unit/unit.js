@@ -479,12 +479,21 @@ test( 'jQuery.deparam - pre-1.4-style params', function() {
 });
 
 test( 'jQuery.deparam - standalone keys', function() {
-  var params_str = 'a=1&a&b=2&c=3&c=undefined&c=&d&e[a]=4&e[b]&e[c]=',
-    params_obj = { a:['1',''], b:'2', c:['3','undefined',''], d:'', e:{a:'4',b:'',c:''} },
-    params_obj_coerce = { a:[1,null], b:2, c:[3,undefined,''], d:null, e:{a:4,b:null,c:''} };
+  var params_str = 'a=1&a&b=2&c=3&c=undefined&c=&d&e[a]=4&e[b]&e[c]=';
 
-  same( $.deparam( params_str, false ), params_obj, '$.deparam( String, false )' );
-  same( $.deparam( params_str, true ), params_obj_coerce, '$.deparam( String, true )' );
+  // Backwards-compatibility test cases
+  var bc_params_obj = { a:'', b:'2', c:['3','undefined',''], d:'', e:{a:'4',c:''}, 'e[b]': '' },
+      bc_params_obj_coerce = { a:undefined, b:2, c:[3,undefined,''], d:undefined, e:{a:4,c:''}, 'e[b]': undefined };
+
+  // Intended-behaviour test cases
+  var params_obj = { a:['1',''], b:'2', c:['3','undefined',''], d:'', e:{a:'4',b:'',c:''} },
+      params_obj_coerce = { a:[1,null], b:2, c:[3,undefined,''], d:null, e:{a:4,b:null,c:''} };
+
+  expect( 4 );
+  same( $.deparam( params_str, false ), bc_params_obj, '$.deparam( String, false )' );
+  same( $.deparam( params_str, true ), bc_params_obj_coerce, '$.deparam( String, true )' );
+  same( $.deparam( params_str, false, true ), params_obj, '$.deparam( String, false, true )' );
+  same( $.deparam( params_str, true, true ), params_obj_coerce, '$.deparam( String, true, true )' );
 });
 
 test( 'jQuery.deparam.querystring', function() {
