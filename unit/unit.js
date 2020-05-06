@@ -482,8 +482,8 @@ test( 'jQuery.deparam - standalone keys', function() {
   var params_str = 'a=1&a&b=2&c=3&c=undefined&c=&d&e[a]=4&e[b]&e[c]=';
 
   // Backwards-compatibility test cases
-  var bc_params_obj = { a:'', b:'2', c:['3','undefined',''], d:'', e:{a:'4',c:''}, 'e[b]': '' },
-      bc_params_obj_coerce = { a:undefined, b:2, c:[3,undefined,''], d:undefined, e:{a:4,c:''}, 'e[b]': undefined };
+  var bc_params_obj = { a:'', b:'2', c:['3','undefined',''], d:'', e:{a:'4',c:''}, 'e[b]':'' },
+      bc_params_obj_coerce = { a:undefined, b:2, c:[3,undefined,''], d:undefined, e:{a:4,c:''}, 'e[b]':undefined };
 
   // Intended-behaviour test cases
   var params_obj = { a:['1',''], b:'2', c:['3','undefined',''], d:'', e:{a:'4',b:'',c:''} },
