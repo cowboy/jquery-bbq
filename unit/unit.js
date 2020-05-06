@@ -478,6 +478,15 @@ test( 'jQuery.deparam - pre-1.4-style params', function() {
   same( $.deparam( params_str, true ), params_obj_coerce, '$.deparam( String, true )' );
 });
 
+test( 'jQuery.deparam - standalone keys', function() {
+  var params_str = 'a=1&a&b=2&c=3&c=undefined&c=&d&e[a]=4&e[b]&e[c]=',
+    params_obj = { a:['1',''], b:'2', c:['3','undefined',''], d:'', e:{a:'4',b:'',c:''} },
+    params_obj_coerce = { a:[1,null], b:2, c:[3,undefined,''], d:null, e:{a:4,b:null,c:''} };
+
+  same( $.deparam( params_str, false ), params_obj, '$.deparam( String, false )' );
+  same( $.deparam( params_str, true ), params_obj_coerce, '$.deparam( String, true )' );
+});
+
 test( 'jQuery.deparam.querystring', function() {
   expect( 12 );
   
